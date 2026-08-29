@@ -58,7 +58,14 @@ class Product(models.Model):
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        help_text="Price in Pakistani Rupees (PKR)"
+        help_text="Current selling price in PKR (e.g. 2500.00)"
+    )
+    original_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        help_text="Original retail price / MRP in PKR (e.g. 3500.00)"
     )
     image = models.ImageField(
         upload_to='products/',
@@ -82,3 +89,24 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def discount_percentage(self):
+        """
+        Dynamically calculates the discount percentage safely.
+        Converts Decimals to float to avoid Django silent template errors.
+        """
+        if not self.original_price or not self.price:
+            return 0
+        
+        if self.original_price <= self.price:
+            return 0
+            
+        try:
+            orig = float(self.original_price)
+            curr = float(self.price)
+            discount = orig - curr
+            percentage = (discount / orig) * 100
+            return int(round(percentage))
+        except (ValueError, ZeroDivisionError, TypeError):
+            return 0

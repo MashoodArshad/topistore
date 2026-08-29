@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TopiStore — Premium Islamic Prayer Caps{% endblock %}</title>
+    <title>{% block title %}Shah G Cap House — Premium Islamic Caps{% endblock %}</title>
     
     <!-- Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Tailwind Custom Configuration (Our Brand Colors from Day 2) -->
+    <!-- Tailwind Custom Configuration (Shah G Cap House Theme) -->
     <script>
         tailwind.config = {
             theme: {
@@ -33,7 +33,7 @@
                             hover: '#B5943B',
                         },
                         surface: '#FAFAFA',     // Clean Off-white
-                        dark: '#212121',        // Text color
+                        dark: '#1A1A1A',        // Premium Dark text
                     }
                 }
             }
@@ -44,7 +44,7 @@
 
     <!-- TOP ANNOUNCEMENT BAR -->
     <div class="bg-primary text-white text-xs text-center py-2 px-4 font-medium tracking-wide">
-        📦 Cash on Delivery Available All Over Pakistan | Standard Delivery 2–4 Days
+        📦 Cash on Delivery Available Across Pakistan | Standard Delivery 2–4 Days
     </div>
 
     <!-- MAIN NAVBAR -->
@@ -55,14 +55,16 @@
                 <!-- Brand Logo -->
                 <div class="flex-shrink-0">
                     <a href="/" class="flex items-center space-x-2">
-                        <span class="text-2xl font-bold text-primary tracking-tight">Topi<span class="text-accent">Store</span></span>
+                        <span class="text-xl sm:text-2xl font-bold text-primary tracking-tight">
+                            Shah G <span class="text-accent font-semibold">Cap House</span>
+                        </span>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation Links -->
                 <nav class="hidden md:flex space-x-8 text-sm font-medium text-gray-700">
                     <a href="/" class="text-primary font-semibold hover:text-primary transition">Home</a>
-                    <a href="#products" class="hover:text-primary transition">All Topis</a>
+                    <a href="#products" class="hover:text-primary transition">Collection</a>
                     <a href="#categories" class="hover:text-primary transition">Categories</a>
                     <a href="#about" class="hover:text-primary transition">About Us</a>
                 </nav>
@@ -72,7 +74,7 @@
                     
                     <!-- Search Bar Placeholder -->
                     <div class="hidden sm:block relative">
-                        <input type="text" placeholder="Search topis..." class="bg-gray-100 text-xs rounded-full pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary w-44">
+                        <input type="text" placeholder="Search articles..." class="bg-gray-100 text-xs rounded-full pl-8 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary w-44 border border-transparent focus:border-transparent">
                         <svg class="w-4 h-4 text-gray-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -86,9 +88,9 @@
                         <span class="absolute -top-1 -right-1 bg-accent text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">0</span>
                     </a>
 
-                    <!-- Login Button -->
-                    <a href="#login" class="hidden sm:inline-block text-xs font-semibold text-primary border border-primary px-3.5 py-1.5 rounded-md hover:bg-primary hover:text-white transition">
-                        Login
+                    <!-- Admin Portal Link (For Owner) -->
+                    <a href="/admin/" target="_blank" class="hidden sm:inline-block text-xs font-semibold text-primary border border-primary px-3 py-1.5 rounded-md hover:bg-primary hover:text-white transition">
+                        Admin Portal
                     </a>
                 </div>
             </div>
@@ -120,20 +122,19 @@
                 
                 <!-- Brand Info -->
                 <div class="space-y-3">
-                    <span class="text-xl font-bold text-white tracking-tight">Topi<span class="text-accent">Store</span></span>
+                    <span class="text-xl font-bold text-white tracking-tight">Shah G <span class="text-accent">Cap House</span></span>
                     <p class="text-xs text-gray-400 leading-relaxed">
-                        Authentic handcrafted Islamic prayer caps and topis delivered to your doorstep with Cash on Delivery across Pakistan.
+                        Authentic premium handcrafted Islamic prayer caps and structured formal topis delivered with Cash on Delivery across Pakistan.
                     </p>
                 </div>
 
                 <!-- Quick Links -->
                 <div>
-                    <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-3">Shop Categories</h4>
+                    <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-3">Quick Navigation</h4>
                     <ul class="space-y-2 text-xs text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">Sindhi Topi</a></li>
-                        <li><a href="#" class="hover:text-white transition">Peshawari Hard Topi</a></li>
-                        <li><a href="#" class="hover:text-white transition">Omani / Arabi Topi</a></li>
-                        <li><a href="#" class="hover:text-white transition">Velvet Embroidered</a></li>
+                        <li><a href="#products" class="hover:text-white transition">All Articles</a></li>
+                        <li><a href="#categories" class="hover:text-white transition">Premium Collections</a></li>
+                        <li><a href="#about" class="hover:text-white transition">Brand Story</a></li>
                     </ul>
                 </div>
 
@@ -142,9 +143,8 @@
                     <h4 class="text-sm font-semibold text-white uppercase tracking-wider mb-3">Customer Support</h4>
                     <ul class="space-y-2 text-xs text-gray-400">
                         <li><a href="#" class="hover:text-white transition">Delivery & Shipping Info</a></li>
-                        <li><a href="#" class="hover:text-white transition">Order Tracking</a></li>
-                        <li><a href="#" class="hover:text-white transition">WhatsApp Support</a></li>
-                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Order Confirmation Details</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cash on Delivery Policy</a></li>
                     </ul>
                 </div>
 
@@ -161,7 +161,7 @@
 
             <!-- Bottom Copyright -->
             <div class="border-t border-gray-800 pt-6 text-center text-xs text-gray-500">
-                <p>&copy; 2025 TopiStore. All rights reserved. Built with Python & Django.</p>
+                <p>&copy; 2025 Shah G Cap House. All rights reserved.</p>
             </div>
         </div>
     </footer>
