@@ -1,99 +1,144 @@
 {% extends 'base.html' %}
 
-{% block title %}The Collection — Shah G Cap House{% endblock %}
+{% block title %}All Articles — Shah G Cap House{% endblock %}
 
 {% block content %}
 
-<!-- ===== HANGING LAMPS FOR AMBIENCE ===== -->
-<div class="relative h-20 overflow-visible hidden md:block">
-    <div class="hanging-lamp" style="left: 12%; top: -20px;">
-        <div class="lamp-string" style="height: 60px;"></div>
-        <div class="lamp-body" style="width: 30px; height: 42px;"></div>
-    </div>
-    <div class="hanging-lamp" style="right: 12%; top: -20px; animation-delay: -2s;">
-        <div class="lamp-string" style="height: 60px;"></div>
-        <div class="lamp-body" style="width: 30px; height: 42px;"></div>
-    </div>
-</div>
-
-<section class="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+<div class="max-w-7xl mx-auto px-5 sm:px-8 py-10">
     
-    <!-- Page Header -->
-    <div class="text-center max-w-2xl mx-auto mb-16 animate-slide-up">
-        <div class="text-gold text-2xl mb-3">✦</div>
-        <span class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium block mb-2">Shah G Signature</span>
-        <h1 class="font-serif text-4xl sm:text-5xl italic text-ink">The Complete Collection</h1>
-        <p class="text-sm text-ink/60 font-light mt-4 leading-relaxed">
-            Browse through our fourteen distinct handcrafted designs. Each structured article is built with dedication to present a stately and dignified appearance.
+    <!-- Header Title Bar -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8 border-b-2 border-slate-200 mb-10">
+        <div>
+            <span class="text-xs font-black uppercase tracking-widest text-emerald-700 block mb-1">
+                Shah G Exclusive Collection
+            </span>
+            <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">
+                All 14 Articles
+            </h1>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium max-w-md">
+            Premium structured Islamic prayer caps featuring authentic photography and firm shape retention.
         </p>
-        <div class="w-12 h-px bg-gold/30 mx-auto mt-6"></div>
     </div>
 
-    <!-- Articles Grid (No boxes, pure editorial space) -->
+    <!-- Search & Sort Filter Bar -->
+    <div class="bg-white border border-slate-200 p-4 rounded-2xl shadow-sm mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Search Input -->
+        <form method="get" action="{% url 'products:product_list' %}" class="w-full md:w-1/2 flex items-center bg-slate-50 border border-slate-300 rounded-xl overflow-hidden focus-within:border-slate-900 transition">
+            <span class="pl-4 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </span>
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Search by Article (e.g. Article 01)..." 
+                   class="w-full bg-transparent px-3 py-3 text-sm text-slate-900 font-bold placeholder-slate-400 focus:outline-none">
+            <button type="submit" class="bg-slate-900 text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3 hover:bg-emerald-800 transition">
+                Search
+            </button>
+        </form>
+
+        <!-- Right: Sort Dropdown & Product Counter -->
+        <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Showing <strong class="text-slate-900 font-black">{{ total_count }}</strong> Articles
+            </span>
+
+            <form method="get" action="{% url 'products:product_list' %}" class="flex items-center gap-2">
+                <input type="hidden" name="q" value="{{ search_query }}">
+                <select name="sort" onchange="this.form.submit()" 
+                        class="bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-slate-900 transition cursor-pointer">
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                    <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>Article Name (A–Z)</option>
+                </select>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- ===== HIGH-IMPACT PRODUCT GRID ===== -->
     {% if products %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         
         {% for product in products %}
-        <div class="product-item group block animate-on-scroll">
+        <div class="modern-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
+            
             <a href="/products/{{ product.slug }}/" class="block">
-                
-                <!-- Product Image with custom discount tags -->
-                <div class="relative overflow-hidden aspect-square bg-ink mb-6">
+                <!-- Product Image Box -->
+                <div class="relative aspect-square bg-slate-950 overflow-hidden">
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img w-full h-full object-cover">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     {% else %}
-                        <div class="w-full h-full flex items-center justify-center text-cream/30 text-5xl">☪</div>
+                        <div class="w-full h-full flex items-center justify-center text-slate-700 text-4xl">☪</div>
                     {% endif %}
 
+                    <!-- Save Discount Pill -->
                     {% if product.discount_percentage > 0 %}
-                    <div class="absolute top-4 left-4 bg-cream text-ink text-[10px] font-medium tracking-widest px-3 py-1 uppercase shadow-sm">
-                        Save {{ product.discount_percentage }}%
-                    </div>
+                    <span class="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-md">
+                        Save {{ product.discount_percentage }}% OFF
+                    </span>
                     {% endif %}
 
-                    <div class="absolute top-4 right-4 bg-ink/80 backdrop-blur-sm text-cream text-[9px] tracking-wider px-2.5 py-0.5 uppercase font-light">
+                    <!-- Stock Badge -->
+                    <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md">
                         {% if product.stock > 0 %}In Stock{% else %}Sold Out{% endif %}
-                    </div>
+                    </span>
                 </div>
 
-                <!-- Product Text Details -->
-                <div class="text-center space-y-2">
-                    <p class="text-[9px] tracking-[0.3em] uppercase text-gold-dark font-medium">
+                <!-- Product Details Box -->
+                <div class="p-5 space-y-3">
+                    <span class="text-[10px] font-extrabold tracking-widest text-emerald-800 uppercase block">
                         {{ product.category.name }}
-                    </p>
-                    <h3 class="font-serif text-2xl italic text-ink group-hover:text-gold-dark transition duration-300">
+                    </span>
+                    
+                    <!-- BOLD BLACK TITLE -->
+                    <h3 class="text-xl font-black tracking-tight text-slate-900 uppercase group-hover:text-emerald-800 transition">
                         {{ product.name }}
                     </h3>
-                    <div class="flex items-baseline justify-center gap-3 pt-1">
-                        <span class="font-serif text-xl text-ink">Rs. {{ product.price|floatformat:0 }}</span>
+
+                    <!-- BOLD RED PRICES -->
+                    <div class="flex items-baseline gap-3 pt-1">
+                        <span class="text-2xl font-black text-red-600 tracking-tight">
+                            Rs. {{ product.price|floatformat:0 }}
+                        </span>
                         {% if product.original_price %}
-                        <span class="text-sm text-ink/40 line-through font-light">Rs. {{ product.original_price|floatformat:0 }}</span>
+                        <span class="text-sm font-bold text-slate-400 line-through">
+                            Rs. {{ product.original_price|floatformat:0 }}
+                        </span>
                         {% endif %}
                     </div>
-                    
-                    <p class="text-[10px] tracking-[0.25em] uppercase text-gold-dark pt-3 border-b border-transparent group-hover:border-gold-dark inline-block pb-0.5 transition duration-300">
-                        View Details →
-                    </p>
                 </div>
-
             </a>
+
+            <!-- Action Button -->
+            <div class="p-5 pt-0">
+                <a href="/products/{{ product.slug }}/" 
+                   class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm">
+                    <span>View Article Details</span>
+                    <span>→</span>
+                </a>
+            </div>
+
         </div>
         {% endfor %}
 
     </div>
+
     {% else %}
-    <div class="text-center py-20">
-        <p class="text-ink/50 font-light italic">The catalog is currently being prepared. Check back shortly.</p>
+    <!-- Empty State -->
+    <div class="bg-white border border-slate-200 rounded-3xl p-12 text-center max-w-lg mx-auto space-y-4">
+        <span class="text-4xl block">🔍</span>
+        <h3 class="text-2xl font-black text-slate-900 uppercase">No Articles Found</h3>
+        <p class="text-xs text-slate-500 font-medium">We couldn't find any results for "{{ search_query }}".</p>
+        <a href="{% url 'products:product_list' %}" class="inline-block bg-slate-900 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl hover:bg-emerald-800 transition">
+            View All 14 Articles
+        </a>
     </div>
     {% endif %}
 
-</section>
-
-<!-- ===== ISLAMIC DIVIDER ===== -->
-<div class="islamic-divider">
-    <div class="line"></div>
-    <div class="ornament">✦</div>
-    <div class="line"></div>
 </div>
 
 {% endblock %}

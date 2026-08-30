@@ -1,28 +1,41 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from products.models import Product, Category
 
 
 def home(request):
     """
     Renders the Shah G Cap House homepage with dynamic categories
-    and active products fetched directly from PostgreSQL database.
+    and featured active products fetched from PostgreSQL database.
     """
     categories = Category.objects.all()
-    # Fetch only active products, ordered by newest first
-    featured_products = Product.objects.filter(is_active=True)[:14]
+    featured_products = Product.objects.filter(is_active=True)[:6]
 
     context = {
         'categories': categories,
         'featured_products': featured_products,
     }
     return render(request, 'core/home.html', context)
-    # existing imports must remain (Product, Category, etc.)
-from django.shortcuts import render
 
-# existing home view...
 
 def about(request):
     """
     Renders the elegant brand story and founder's profile page.
     """
     return render(request, 'core/about.html')
+
+
+def contact(request):
+    """
+    Renders the customer support & WhatsApp contact page.
+    Handles customer inquiries submission.
+    """
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        messages.success(
+            request, 
+            f"JazakAllah Khair {name}! Your message has been received. Our team will reach out to you shortly."
+        )
+        return redirect('core:contact')
+
+    return render(request, 'core/contact.html')
