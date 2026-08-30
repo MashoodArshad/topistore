@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Our Heritage — Shah G Cap House{% endblock %}
+
+{% block content %}
+
+<!-- ===== HANGING LAMPS ===== -->
+<div class="relative h-20 overflow-visible hidden md:block">
+    <div class="hanging-lamp" style="left: 10%; top: -20px;">
+        <div class="lamp-string" style="height: 50px;"></div>
+        <div class="lamp-body" style="width: 25px; height: 35px;"></div>
+    </div>
+    <div class="hanging-lamp" style="right: 10%; top: -20px; animation-delay: -1.5s;">
+        <div class="lamp-string" style="height: 50px;"></div>
+        <div class="lamp-body" style="width: 25px; height: 35px;"></div>
+    </div>
+</div>
+
+<section class="max-w-5xl mx-auto px-6 lg:px-10 py-12">
+    
+    <!-- Page Header -->
+    <div class="text-center max-w-2xl mx-auto mb-16 animate-slide-up">
+        <div class="text-gold text-2xl mb-3">✦</div>
+        <span class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium block mb-2">Our Heritage</span>
+        <h1 class="font-serif text-4xl sm:text-5xl italic text-ink">About Shah G Cap House</h1>
+        <div class="w-12 h-px bg-gold/30 mx-auto mt-5"></div>
+    </div>
+
+    <!-- 1. FOUNDER SECTION (NOW AT THE TOP) -->
+    <div class="pb-16 animate-fade-in">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+            
+            <!-- Left: Biography Text -->
+            <div class="md:col-span-7 space-y-6 order-2 md:order-1 leading-relaxed text-sm font-light text-ink/80 text-center md:text-left">
+                <span class="text-[10px] tracking-[0.25em] uppercase text-gold-dark font-medium block">Meet the Founder</span>
+                <h2 class="font-serif text-3xl sm:text-4xl italic text-ink font-bold">Mashood Arshad</h2>
+                <div class="w-8 h-px bg-gold/40 my-3 mx-auto md:mx-0"></div>
+                
+                <p class="italic text-ink/75 font-normal">
+                    “At Shah G Cap House, we believe that an Islamic cap is not just an accessory, but a representation of respect and purpose during salah.”
+                </p>
+                <p>
+                    [Add your personal/business introduction here. You can write about your background, the philosophy behind starting Shah G Cap House, your commitment to the community, or your focus on providing authentic structured topis to caps-lovers across Pakistan.]
+                </p>
+                <p>
+                    [Feel free to edit this section inside templates/core/about.html to tell your true founder story when you are ready.]
+                </p>
+            </div>
+
+                        <!-- Right: Single Circular Profile Image Frame (With Live Image Connection) -->
+            <div class="md:col-span-5 order-1 md:order-2 flex justify-center items-center">
+                <div class="w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-ink flex flex-col items-center justify-center text-center border-2 border-gold shadow-2xl relative overflow-hidden group">
+                    
+                    <!-- 📸 LIVE IMAGE TAG: Fixed extension to .jpeg -->
+                    <img src="{% static 'images/mashood-profile.jpeg' %}" 
+                         alt="Mashood Arshad" 
+                         onerror="this.style.display='none'; document.getElementById('placeholder-text').style.display='block';"
+                         class="w-full h-full object-cover absolute inset-0 z-10">
+                    
+                    <!-- Temporary Text Placeholder (Yeh tabhi dikhega jab tak aap folder mein image nahi rakhte) -->
+                    <div id="placeholder-text" class="space-y-1 relative z-0" style="display: none;">
+                        <span class="text-gold text-5xl sm:text-6xl select-none leading-none">👤</span>
+                        <p class="text-[10px] text-gold-light tracking-[0.2em] uppercase font-light max-w-[180px] mx-auto pt-2">
+                            Place portrait inside static/images/
+                        </p>
+                    </div>
+
+                    <!-- Subtle Inner Gold Frame -->
+                    <div class="absolute inset-0 border border-gold/15 rounded-full m-3 pointer-events-none z-20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ISLAMIC DIVIDER ===== -->
+    <div class="islamic-divider">
+        <div class="line"></div>
+        <div class="ornament">✦</div>
+        <div class="line"></div>
+    </div>
+
+    <!-- 2. BRAND STORY (NOW AT THE BOTTOM) -->
+    <div class="max-w-3xl mx-auto space-y-6 font-light text-ink/80 leading-relaxed text-base text-center pt-8 pb-12 animate-on-scroll">
+        <h2 class="font-serif text-3xl italic text-ink text-center">Premium Islamic Craftsmanship</h2>
+        <p>
+            Welcome to Shah G Cap House. We specialize in the curation and supply of fine structured Islamic prayer caps and formal topis. 
+            Our brand stands as a quiet celebration of faith, crafting caps designed specifically for those who value neat structure, 
+            refined detail, and a stately appearance.
+        </p>
+        <p>
+            Unlike generic caps, each of our 14 distinct articles is designed to retain its shape perfectly, presenting a dignified silhouette. 
+            Our commitment to premium finishing and authentic, unedited product representation ensures that the cap you receive is exactly 
+            as magnificent as the one photographed.
+        </p>
+    </div>
+
+</section>
+
+<!-- ===== ISLAMIC DIVIDER ===== -->
+<div class="islamic-divider">
+    <div class="line"></div>
+    <div class="ornament">✦</div>
+    <div class="line"></div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}The Collection — Shah G Cap House{% endblock %}
+
+{% block content %}
+
+<!-- ===== HANGING LAMPS FOR AMBIENCE ===== -->
+<div class="relative h-20 overflow-visible hidden md:block">
+    <div class="hanging-lamp" style="left: 12%; top: -20px;">
+        <div class="lamp-string" style="height: 60px;"></div>
+        <div class="lamp-body" style="width: 30px; height: 42px;"></div>
+    </div>
+    <div class="hanging-lamp" style="right: 12%; top: -20px; animation-delay: -2s;">
+        <div class="lamp-string" style="height: 60px;"></div>
+        <div class="lamp-body" style="width: 30px; height: 42px;"></div>
+    </div>
+</div>
+
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+    
+    <!-- Page Header -->
+    <div class="text-center max-w-2xl mx-auto mb-16 animate-slide-up">
+        <div class="text-gold text-2xl mb-3">✦</div>
+        <span class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium block mb-2">Shah G Signature</span>
+        <h1 class="font-serif text-4xl sm:text-5xl italic text-ink">The Complete Collection</h1>
+        <p class="text-sm text-ink/60 font-light mt-4 leading-relaxed">
+            Browse through our fourteen distinct handcrafted designs. Each structured article is built with dedication to present a stately and dignified appearance.
+        </p>
+        <div class="w-12 h-px bg-gold/30 mx-auto mt-6"></div>
+    </div>
+
+    <!-- Articles Grid (No boxes, pure editorial space) -->
+    {% if products %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+        
+        {% for product in products %}
+        <div class="product-item group block animate-on-scroll">
+            <a href="/products/{{ product.slug }}/" class="block">
+                
+                <!-- Product Image with custom discount tags -->
+                <div class="relative overflow-hidden aspect-square bg-ink mb-6">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-cream/30 text-5xl">☪</div>
+                    {% endif %}
+
+                    {% if product.discount_percentage > 0 %}
+                    <div class="absolute top-4 left-4 bg-cream text-ink text-[10px] font-medium tracking-widest px-3 py-1 uppercase shadow-sm">
+                        Save {{ product.discount_percentage }}%
+                    </div>
+                    {% endif %}
+
+                    <div class="absolute top-4 right-4 bg-ink/80 backdrop-blur-sm text-cream text-[9px] tracking-wider px-2.5 py-0.5 uppercase font-light">
+                        {% if product.stock > 0 %}In Stock{% else %}Sold Out{% endif %}
+                    </div>
+                </div>
+
+                <!-- Product Text Details -->
+                <div class="text-center space-y-2">
+                    <p class="text-[9px] tracking-[0.3em] uppercase text-gold-dark font-medium">
+                        {{ product.category.name }}
+                    </p>
+                    <h3 class="font-serif text-2xl italic text-ink group-hover:text-gold-dark transition duration-300">
+                        {{ product.name }}
+                    </h3>
+                    <div class="flex items-baseline justify-center gap-3 pt-1">
+                        <span class="font-serif text-xl text-ink">Rs. {{ product.price|floatformat:0 }}</span>
+                        {% if product.original_price %}
+                        <span class="text-sm text-ink/40 line-through font-light">Rs. {{ product.original_price|floatformat:0 }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-[10px] tracking-[0.25em] uppercase text-gold-dark pt-3 border-b border-transparent group-hover:border-gold-dark inline-block pb-0.5 transition duration-300">
+                        View Details →
+                    </p>
+                </div>
+
+            </a>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+    <div class="text-center py-20">
+        <p class="text-ink/50 font-light italic">The catalog is currently being prepared. Check back shortly.</p>
+    </div>
+    {% endif %}
+
+</section>
+
+<!-- ===== ISLAMIC DIVIDER ===== -->
+<div class="islamic-divider">
+    <div class="line"></div>
+    <div class="ornament">✦</div>
+    <div class="line"></div>
+</div>
+
+{% endblock %}

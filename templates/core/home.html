@@ -1,210 +1,124 @@
 {% extends 'base.html' %}
 
-{% block title %}Shah G Cap House — Premium Islamic Prayer Caps & Structured Topis{% endblock %}
+{% block title %}Shah G Cap House — Handcrafted Islamic Elegance{% endblock %}
 
 {% block content %}
 
-<!-- 1. HERO SECTION -->
-<section class="bg-gradient-to-r from-primary to-[#0D3B13] text-white py-16 md:py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            
-            <!-- Left: Hero Text & Call-to-Action -->
-            <div class="space-y-6 text-center md:text-left">
-                <span class="inline-block bg-accent/20 text-accent text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider border border-accent/30">
-                    Shah G Cap House Official
-                </span>
-                <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight tracking-tight">
-                    Premium Structured <span class="text-accent">Islamic Caps</span> for Every Prayer
-                </h1>
-                <p class="text-sm sm:text-base text-gray-200 leading-relaxed max-w-lg">
-                    Discover our exclusive collection of structured, highly ornamented prayer caps. Handcrafted with fine decorative finishing and delivered nationwide.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start pt-2">
-                    <a href="#products" class="bg-accent hover:bg-accent-hover text-dark font-semibold px-6 py-3 rounded-lg text-sm transition text-center shadow-lg">
-                        Explore Collection
-                    </a>
-                    <a href="#about" class="border border-white/40 hover:bg-white/10 text-white font-medium px-6 py-3 rounded-lg text-sm transition text-center">
-                        About Shah G
-                    </a>
-                </div>
-            </div>
-
-            <!-- Right: Hero Visual Card -->
-            <div class="hidden md:flex justify-center">
-                <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-8 rounded-2xl max-w-sm text-center space-y-4 shadow-2xl">
-                    <div class="w-48 h-48 bg-white/20 rounded-xl mx-auto flex items-center justify-center text-5xl shadow-inner">
-                        🕌
-                    </div>
-                    <h3 class="text-lg font-bold text-white">Authentic Craftsmanship</h3>
-                    <p class="text-xs text-gray-200">Structured Form • Ornate Detailing • Premium Finish</p>
-                </div>
-            </div>
-
-        </div>
+<!-- ===== HERO SECTION (Full Screen) ===== -->
+<section class="relative min-h-[90vh] flex items-center justify-center px-6 py-20 overflow-hidden">
+    
+    <!-- Hanging Lamps -->
+    <div class="hanging-lamp hidden md:block" style="left: 8%; top: 0;">
+        <div class="lamp-string"></div>
+        <div class="lamp-body"></div>
     </div>
-</section>
-
-
-<!-- 2. VALUE PROPOSITIONS -->
-<section class="border-b border-gray-200 bg-white py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                <span class="text-2xl">💵</span>
-                <div>
-                    <h4 class="text-xs font-bold text-gray-900">Cash on Delivery</h4>
-                    <p class="text-[11px] text-gray-500">Pay when you receive parcel</p>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                <span class="text-2xl">🚚</span>
-                <div>
-                    <h4 class="text-xs font-bold text-gray-900">Nationwide Delivery</h4>
-                    <p class="text-[11px] text-gray-500">2–4 business days across Pakistan</p>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                <span class="text-2xl">✨</span>
-                <div>
-                    <h4 class="text-xs font-bold text-gray-900">Original Photography</h4>
-                    <p class="text-[11px] text-gray-500">100% real product images</p>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50 border border-gray-100">
-                <span class="text-2xl">📦</span>
-                <div>
-                    <h4 class="text-xs font-bold text-gray-900">Safe Packaging</h4>
-                    <p class="text-[11px] text-gray-500">Carefully boxed & structured</p>
-                </div>
-            </div>
-
-        </div>
+    <div class="hanging-lamp hidden md:block" style="right: 8%; top: 0; animation-delay: -3s;">
+        <div class="lamp-string"></div>
+        <div class="lamp-body"></div>
     </div>
-</section>
 
-
-<!-- 3. DYNAMIC CATEGORIES -->
-{% if categories %}
-<section id="categories" class="py-12 bg-surface">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto text-center relative z-10">
+        <div class="text-gold text-3xl mb-6 tracking-widest">✦ ☾ ✦</div>
         
-        <div class="text-center max-w-xl mx-auto mb-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Our Collections</h2>
-            <p class="text-xs sm:text-sm text-gray-500 mt-2">Explore handcrafted structured caps by category</p>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-4 sm:gap-6">
-            {% for category in categories %}
-            <a href="#products" class="bg-white rounded-xl px-6 py-4 text-center border border-gray-200 hover:border-primary hover:shadow-md transition min-w-[200px]">
-                <h3 class="text-sm font-bold text-gray-900">{{ category.name }}</h3>
-                <p class="text-[11px] text-gray-500 mt-1">{{ category.products.count }} Articles Available</p>
+        <p class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium mb-6">
+            The Royal Collection · Since 2025
+        </p>
+        
+        <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl italic text-ink leading-tight mb-8">
+            Where Tradition<br>
+            <span class="text-gold-dark">Meets</span> Elegance
+        </h1>
+        
+        <p class="text-base text-ink/70 leading-relaxed max-w-xl mx-auto mb-10 font-light">
+            Each cap in our collection is a quiet celebration of Islamic craftsmanship, 
+            designed for those who appreciate refined detail and dignified presence.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-5 justify-center items-center">
+            <a href="/products/" class="btn-gold inline-block bg-ink text-cream px-10 py-4 text-[11px] tracking-[0.3em] uppercase font-medium border border-ink hover:bg-transparent hover:text-ink transition">
+                Explore Collection
             </a>
-            {% endfor %}
+            <a href="/about/" class="text-[11px] tracking-[0.3em] uppercase text-ink/60 hover:text-gold-dark transition border-b border-transparent hover:border-gold-dark pb-1 font-medium">
+                Our Heritage →
+            </a>
         </div>
+
+        <div class="mt-20 text-gold/50 text-xl animate-bounce">↓</div>
     </div>
 </section>
-{% endif %}
 
+<!-- ===== FEATURED SIGNATURE PRODUCTS ===== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+    <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium block mb-2">Selected Masterpieces</span>
+        <h2 class="font-serif text-3xl sm:text-4xl italic text-ink">The Signature Articles</h2>
+        <div class="w-12 h-px bg-gold/30 mx-auto mt-4"></div>
+    </div>
 
-<!-- 4. DYNAMIC PRODUCTS CATALOG -->
-<section id="products" class="py-16 bg-white border-t border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-10">
-            <div>
-                <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Featured Articles</h2>
-                <p class="text-xs sm:text-sm text-gray-500 mt-1">Authentic handcrafted Islamic prayer caps</p>
-            </div>
-            <span class="text-xs font-semibold text-gray-500 mt-2 sm:mt-0">
-                Showing {{ featured_products|length }} Article(s)
-            </span>
-        </div>
+    {% if featured_products %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
+        {% for product in featured_products %}
+        <div class="product-item group block fade-in">
+            <a href="/products/{{ product.slug }}/" class="block">
+                <!-- Product Image -->
+                <div class="relative overflow-hidden aspect-square bg-ink mb-6">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-cream/30 text-5xl">☪</div>
+                    {% endif %}
 
-        <!-- DYNAMIC GRID -->
-        {% if featured_products %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            {% for product in featured_products %}
-            <div class="bg-surface rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-                
-                <div>
-                    <!-- Product Image Container with Badges -->
-                    <div class="relative h-64 bg-gray-900 overflow-hidden flex items-center justify-center">
-                        
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        {% else %}
-                            <div class="text-gray-400 text-sm flex flex-col items-center">
-                                <span class="text-3xl mb-1">🧢</span>
-                                <span>No Photo Uploaded</span>
-                            </div>
-                        {% endif %}
-
-                                               <!-- Discount Percentage Badge -->
-                        {% if product.discount_percentage > 0 %}
-                        <span class="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-bold px-2 py-0.5 rounded shadow">
-                            {{ product.discount_percentage }}% OFF
-                        </span>
-                        {% endif %}
-
-                        <!-- Stock Status Badge -->
-                        <span class="absolute top-3 right-3 bg-green-900/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded">
-                            {% if product.stock > 0 %}In Stock ({{ product.stock }}){% else %}Out of Stock{% endif %}
-                        </span>
+                    {% if product.discount_percentage > 0 %}
+                    <div class="absolute top-4 left-4 bg-cream text-ink text-[10px] font-medium tracking-widest px-3 py-1 uppercase shadow-sm">
+                        Save {{ product.discount_percentage }}%
                     </div>
+                    {% endif %}
 
-                    <!-- Product Information -->
-                    <div class="p-4">
-                        <span class="text-[10px] font-bold text-accent uppercase tracking-wider">
-                            {{ product.category.name }}
-                        </span>
-                        <h3 class="text-base font-bold text-gray-900 mt-1 group-hover:text-primary transition">
-                            {{ product.name }}
-                        </h3>
-                        <p class="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed">
-                            {{ product.description }}
-                        </p>
+                    <div class="absolute top-4 right-4 bg-ink/80 backdrop-blur-sm text-cream text-[9px] tracking-wider px-2.5 py-0.5 uppercase font-light">
+                        {% if product.stock > 0 %}In Stock{% else %}Sold Out{% endif %}
                     </div>
                 </div>
 
-                <!-- Pricing & Action Button -->
-                <div class="p-4 pt-0">
-                    <div class="flex items-baseline space-x-2 mt-2 pt-2 border-t border-gray-100">
-                        <!-- Current Selling Price -->
-                        <span class="text-lg font-bold text-primary">
-                            Rs. {{ product.price|floatformat:0 }}
-                        </span>
-                        
-                        <!-- Original MRP Price (Cut/Strikethrough) -->
+                <!-- Product Details -->
+                <div class="text-center space-y-2">
+                    <p class="text-[9px] tracking-[0.3em] uppercase text-gold-dark font-medium">
+                        {{ product.category.name }}
+                    </p>
+                    <h3 class="font-serif text-2xl italic text-ink group-hover:text-gold-dark transition duration-300">
+                        {{ product.name }}
+                    </h3>
+                    <div class="flex items-baseline justify-center gap-3 pt-1">
+                        <span class="font-serif text-xl text-ink">Rs. {{ product.price|floatformat:0 }}</span>
                         {% if product.original_price %}
-                        <span class="text-xs text-gray-400 line-through font-medium">
-                            Rs. {{ product.original_price|floatformat:0 }}
-                        </span>
+                        <span class="text-sm text-ink/40 line-through font-light">Rs. {{ product.original_price|floatformat:0 }}</span>
                         {% endif %}
                     </div>
-
-                    <button class="w-full mt-3 bg-primary hover:bg-primary-hover text-white text-xs font-semibold py-2.5 rounded-lg transition shadow-sm flex items-center justify-center space-x-1">
-                        <span>View Details</span>
-                        <span>&rarr;</span>
-                    </button>
                 </div>
-
-            </div>
-            {% endfor %}
-
+            </a>
         </div>
-        {% else %}
-        <div class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-            <p class="text-gray-500 text-sm">No articles active in the catalog currently.</p>
-        </div>
-        {% endif %}
-
+        {% endfor %}
     </div>
+
+    <!-- View All Button -->
+    <div class="text-center mt-16">
+        <a href="/products/" class="btn-gold inline-block bg-transparent text-ink px-10 py-4 text-[11px] tracking-[0.3em] uppercase font-medium border border-ink hover:bg-ink hover:text-cream transition">
+            View Complete Collection
+        </a>
+    </div>
+
+    {% else %}
+    <div class="text-center py-12">
+        <p class="text-ink/50 font-light italic">Dynamic collection is being updated. Explore below.</p>
+        <a href="/products/" class="mt-4 inline-block text-[11px] tracking-widest uppercase text-gold-dark hover:underline">Go to Collection →</a>
+    </div>
+    {% endif %}
 </section>
 
-{% endblock content %}
+<!-- ===== ISLAMIC DIVIDER ===== -->
+<div class="islamic-divider">
+    <div class="line"></div>
+    <div class="ornament">✦</div>
+    <div class="line"></div>
+</div>
+
+{% endblock %}

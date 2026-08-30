@@ -16,3 +16,13 @@ def home(request):
         'featured_products': featured_products,
     }
     return render(request, 'core/home.html', context)
+    # existing imports must remain (Product, Category, etc.)
+from django.shortcuts import render
+
+# existing home view...
+
+def about(request):
+    """
+    Renders the elegant brand story and founder's profile page.
+    """
+    return render(request, 'core/about.html')

@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Cart — Shah G Cap House{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 lg:px-10 py-16 fade-in">
+    
+    <!-- Page Header -->
+    <div class="text-center max-w-xl mx-auto mb-16">
+        <div class="text-gold text-2xl mb-3">✦</div>
+        <span class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium block mb-2">Shopping Bag</span>
+        <h1 class="font-serif text-4xl italic text-ink">Selected Articles</h1>
+        <div class="w-12 h-px bg-gold/30 mx-auto mt-5"></div>
+    </div>
+
+    {% if cart %}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- LEFT: Items List Table (65% Width) -->
+        <div class="lg:col-span-8 space-y-6">
+            <div class="border-b border-gold/20 pb-4 hidden md:grid grid-cols-12 text-[10px] tracking-widest uppercase text-gold-dark font-semibold">
+                <div class="col-span-6">Article Details</div>
+                <div class="col-span-2 text-center">Quantity</div>
+                <div class="col-span-2 text-right">Price</div>
+                <div class="col-span-2 text-right">Total</div>
+            </div>
+
+            {% for item in cart %}
+            <div class="grid grid-cols-1 md:grid-cols-12 items-center gap-6 py-6 border-b border-gold/10">
+                
+                <!-- Product Details (Img + Name) -->
+                <div class="col-span-1 md:col-span-6 flex items-center gap-4">
+                    <div class="w-20 h-20 bg-ink relative overflow-hidden flex-shrink-0">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-cream/20 text-3xl">☪</div>
+                        {% endif %}
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[9px] tracking-widest uppercase text-gold-dark font-medium block">
+                            {{ item.product.category.name }}
+                        </span>
+                        <h3 class="font-serif text-xl italic text-ink">
+                            <a href="/products/{{ item.product.slug }}/" class="hover:text-gold-dark transition">
+                                {{ item.product.name }}
+                            </a>
+                        </h3>
+                        <p class="text-xs text-ink/50 font-light">
+                            Unit Price: Rs. {{ item.price|floatformat:0 }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quantity (Display) -->
+                <div class="col-span-1 md:col-span-2 flex justify-center">
+                    <div class="border border-gold/30 px-4 py-1.5 text-center">
+                        <span class="text-xs font-bold text-ink">Qty: {{ item.quantity }}</span>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="col-span-1 md:col-span-2 text-left md:text-right">
+                    <span class="text-xs text-ink/60 md:hidden font-medium tracking-wide block uppercase text-gold-dark mb-1">Price</span>
+                    <span class="text-sm font-medium text-ink">Rs. {{ item.price|floatformat:0 }}</span>
+                </div>
+
+                <!-- Item Total & Remove -->
+                <div class="col-span-1 md:col-span-2 text-left md:text-right flex md:flex-col justify-between items-baseline md:items-end gap-2">
+                    <span class="text-xs text-ink/60 md:hidden font-medium tracking-wide uppercase text-gold-dark">Total</span>
+                    <div class="text-right">
+                        <span class="text-base font-bold text-ink block">Rs. {{ item.total_price|floatformat:0 }}</span>
+                        
+                        <!-- Remove Form (Secure POST) -->
+                        <form method="post" action="{% url 'cart:cart_remove' item.product.id %}" class="inline">
+                            {% csrf_token %}
+                            <button type="submit" class="text-[10px] tracking-widest text-red-700/80 hover:text-red-700 uppercase font-medium mt-2 transition inline-block">
+                                Remove ✕
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+            
+            <div class="pt-4">
+                <a href="/products/" class="text-xs tracking-widest uppercase text-ink/50 hover:text-gold-dark font-semibold transition inline-block">
+                    ← Continue Shopping
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT: Order Summary Card (35% Width) -->
+        <div class="lg:col-span-4 bg-white/20 backdrop-blur-md border border-gold/15 p-8 rounded-lg space-y-6">
+            <h3 class="font-serif text-2xl italic text-ink border-b border-gold/10 pb-4">Order Summary</h3>
+            
+            <div class="space-y-4 text-sm font-light text-ink/80">
+                <div class="flex justify-between">
+                    <span>Subtotal</span>
+                    <span class="font-medium text-ink">Rs. {{ subtotal|floatformat:0 }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Shipping Fee</span>
+                    <span class="font-medium text-ink">
+                        {% if shipping_fee == 0 %}
+                            <span class="text-forest font-semibold">FREE</span>
+                        {% else %}
+                            Rs. {{ shipping_fee|floatformat:0 }}
+                        {% endif %}
+                    </span>
+                </div>
+                {% if shipping_fee > 0 %}
+                <p class="text-[10px] text-ink/50 italic">Add items worth Rs. {{ 5000|add:"-subtotal"|default:0 }} more for Free Shipping!</p>
+                {% endif %}
+                <div class="border-t border-gold/15 pt-4 flex justify-between text-base font-bold text-ink">
+                    <span>Total Payable</span>
+                    <span class="text-lg text-ink">Rs. {{ grand_total|floatformat:0 }}</span>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <a href="/checkout/" class="btn-gold w-full inline-block bg-ink text-cream text-center px-6 py-4 text-[11px] tracking-[0.2em] uppercase font-medium border border-ink hover:bg-transparent hover:text-ink transition">
+                    Proceed to Checkout
+                </a>
+            </div>
+
+            <div class="text-center pt-2">
+                <span class="text-[10px] text-ink/50 tracking-wider font-light uppercase block">
+                    🔒 Cash on Delivery Across Pakistan
+                </span>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <!-- Empty Cart Shell -->
+    <div class="text-center py-20 bg-white/10 backdrop-blur-md border border-gold/15 rounded-lg max-w-2xl mx-auto">
+        <span class="text-5xl block mb-6">👜</span>
+        <h2 class="font-serif text-2xl italic text-ink mb-4">Your Cart is Empty</h2>
+        <p class="text-xs text-ink/60 font-light max-w-md mx-auto mb-8">
+            You have not added any premium articles to your shopping bag yet. Explore our royal collection to find the perfect prayer cap.
+        </p>
+        <a href="/products/" class="btn-gold inline-block bg-ink text-cream px-8 py-3.5 text-[11px] tracking-[0.2em] uppercase font-medium transition">
+            Browse Collection
+        </a>
+    </div>
+    {% endif %}
+
+</section>
+
+<!-- ===== ISLAMIC DIVIDER ===== -->
+<div class="islamic-divider">
+    <div class="line"></div>
+    <div class="ornament">✦</div>
+    <div class="line"></div>
+</div>
+
+{% endblock %}

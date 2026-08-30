@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} — Shah G Cap House{% endblock %}
+
+{% block content %}
+
+<!-- ===== PRODUCT DETAIL HERO ===== -->
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+    
+    <!-- Breadcrumb Navigation -->
+    <div class="flex items-center gap-2 text-xs text-ink/50 mb-8 font-light">
+        <a href="/" class="hover:text-gold-dark transition">Home</a>
+        <span>/</span>
+        <a href="/products/" class="hover:text-gold-dark transition">Collection</a>
+        <span>/</span>
+        <span class="text-ink">{{ product.name }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24">
+        
+        <!-- ===== LEFT: Product Image ===== -->
+        <div class="relative animate-fade-in">
+            <div class="aspect-square bg-ink rounded-sm overflow-hidden">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-cream/30 text-7xl">☪</div>
+                {% endif %}
+            </div>
+            
+            <!-- Hanging Lamp Decoration -->
+            <div class="hidden lg:block hanging-lamp" style="left: -40px; top: -60px;">
+                <div class="lamp-string" style="height: 50px;"></div>
+                <div class="lamp-body" style="width: 25px; height: 35px;"></div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT: Product Information ===== -->
+        <div class="flex flex-col justify-center animate-fade-in" style="animation-delay: 0.2s;">
+            
+            <!-- Category Badge -->
+            <p class="text-[10px] tracking-[0.35em] uppercase text-gold-dark font-medium mb-4">
+                {{ product.category.name }}
+            </p>
+
+            <!-- Product Name -->
+            <h1 class="font-serif text-4xl sm:text-5xl italic text-ink mb-6">
+                {{ product.name }}
+            </h1>
+
+            <!-- Price Section with Discount -->
+            <div class="flex items-baseline gap-4 mb-6">
+                <span class="font-serif text-3xl text-ink">Rs. {{ product.price|floatformat:0 }}</span>
+                {% if product.original_price %}
+                <span class="text-xl text-ink/40 line-through font-light">Rs. {{ product.original_price|floatformat:0 }}</span>
+                {% endif %}
+                {% if product.discount_percentage > 0 %}
+                <span class="bg-gold text-ink text-[10px] font-medium tracking-widest px-3 py-1 uppercase">
+                    Save {{ product.discount_percentage }}%
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-8 pb-8 border-b border-gold/20">
+                {% if product.stock > 0 %}
+                <p class="text-sm text-forest font-medium flex items-center gap-2">
+                    <span class="w-2 h-2 bg-forest rounded-full"></span>
+                    In Stock — {{ product.stock }} units available
+                </p>
+                {% else %}
+                <p class="text-sm text-red-700 font-medium flex items-center gap-2">
+                    <span class="w-2 h-2 bg-red-700 rounded-full"></span>
+                    Currently Out of Stock
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-8">
+                <p class="text-sm text-ink/70 leading-relaxed font-light">
+                    {{ product.description }}
+                </p>
+            </div>
+
+            <!-- Add to Cart Form -->
+            {% if product.stock > 0 %}
+            <form method="post" action="/cart/add/{{ product.id }}/" class="space-y-4 mb-8">
+                {% csrf_token %}
+                
+                <!-- Quantity Selector -->
+                <div class="flex items-center gap-4">
+                    <label class="text-[11px] tracking-[0.25em] uppercase text-ink/60 font-medium">Quantity</label>
+                    <div class="flex items-center border border-ink/20">
+                        <button type="button" onclick="decrementQty()" class="px-4 py-3 text-ink hover:bg-cream-dark transition">−</button>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" class="w-16 text-center text-sm font-medium border-x border-ink/20 py-2 focus:outline-none">
+                        <button type="button" onclick="incrementQty()" class="px-4 py-3 text-ink hover:bg-cream-dark transition">+</button>
+                    </div>
+                </div>
+
+                <!-- Add to Cart Button -->
+                <button type="submit" class="btn-gold w-full bg-ink text-cream py-4 text-[11px] tracking-[0.3em] uppercase font-medium hover:bg-gold hover:text-ink transition">
+                    Add to Cart
+                </button>
+            </form>
+            {% else %}
+            <button disabled class="w-full bg-ink/30 text-ink/50 py-4 text-[11px] tracking-[0.3em] uppercase font-medium cursor-not-allowed">
+                Out of Stock
+            </button>
+            {% endif %}
+
+                        <!-- Additional Info (Bold, Clean & Professional) -->
+            <div class="space-y-4 pt-8 border-t border-gold/20 text-xs text-ink">
+                
+                <!-- Prop 1 -->
+                <div class="flex flex-col space-y-0.5">
+                    <span class="text-[9px] tracking-[0.25em] uppercase text-gold-dark font-semibold">Delivery</span>
+                    <p class="font-bold text-ink">Nationwide Delivery <span class="font-light text-ink/60">· 2–4 business days</span></p>
+                </div>
+
+                <!-- Prop 2 -->
+                <div class="flex flex-col space-y-0.5">
+                    <span class="text-[9px] tracking-[0.25em] uppercase text-gold-dark font-semibold">Payment</span>
+                    <p class="font-bold text-ink">Cash on Delivery <span class="font-light text-ink/60">· Available across Pakistan</span></p>
+                </div>
+
+                <!-- Prop 3 -->
+                <div class="flex flex-col space-y-0.5">
+                    <span class="text-[9px] tracking-[0.25em] uppercase text-gold-dark font-semibold">Authenticity</span>
+                    <p class="font-bold text-ink">100% Real Product Photography</p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ===== ISLAMIC DIVIDER ===== -->
+<div class="islamic-divider">
+    <div class="line"></div>
+    <div class="ornament">✦</div>
+    <div class="line"></div>
+</div>
+
+<!-- ===== RELATED PRODUCTS ===== -->
+{% if related_products %}
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+    <div class="text-center mb-12">
+        <p class="text-[11px] tracking-[0.35em] uppercase text-gold-dark font-medium mb-3">You May Also Appreciate</p>
+        <h2 class="font-serif text-3xl italic text-ink">Related Articles</h2>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
+        {% for related in related_products %}
+        <a href="/products/{{ related.slug }}/" class="product-item group block animate-on-scroll">
+            <div class="relative overflow-hidden aspect-square bg-ink mb-5">
+                {% if related.image %}
+                    <img src="{{ related.image.url }}" alt="{{ related.name }}" class="product-img w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-cream/30 text-5xl">☪</div>
+                {% endif %}
+            </div>
+            <div class="text-center space-y-2">
+                <p class="text-[9px] tracking-[0.3em] uppercase text-gold-dark font-medium">{{ related.category.name }}</p>
+                <h3 class="font-serif text-xl italic text-ink group-hover:text-gold-dark transition">{{ related.name }}</h3>
+                <div class="flex items-baseline justify-center gap-2">
+                    <span class="font-serif text-lg text-ink">Rs. {{ related.price|floatformat:0 }}</span>
+                    {% if related.original_price %}
+                    <span class="text-xs text-ink/40 line-through font-light">Rs. {{ related.original_price|floatformat:0 }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Quantity Selector Functions
+    function incrementQty() {
+        const input = document.getElementById('quantity');
+        const max = parseInt(input.getAttribute('max'));
+        if (parseInt(input.value) < max) {
+            input.value = parseInt(input.value) + 1;
+        }
+    }
+
+    function decrementQty() {
+        const input = document.getElementById('quantity');
+        if (parseInt(input.value) > 1) {
+            input.value = parseInt(input.value) - 1;
+        }
+    }
+</script>
+{% endblock %}

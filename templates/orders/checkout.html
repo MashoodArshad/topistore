@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout — Shah G Cap House{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 lg:px-10 py-16 fade-in">
+    
+    <!-- Page Header -->
+    <div class="text-center max-w-xl mx-auto mb-16">
+        <div class="text-gold text-2xl mb-3">✦</div>
+        <span class="text-[11px] tracking-[0.4em] uppercase text-gold-dark font-medium block mb-2">Delivery Details</span>
+        <h1 class="font-serif text-4xl italic text-ink">Checkout</h1>
+        <div class="w-12 h-px bg-gold/30 mx-auto mt-5"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- LEFT: Delivery Information Form (60% Width) -->
+        <div class="lg:col-span-7 bg-white/20 backdrop-blur-md border border-gold/15 p-8 rounded-lg">
+            <h3 class="font-serif text-2xl italic text-ink mb-6">Delivery Information</h3>
+            
+            <form method="post" action="{% url 'orders:checkout' %}" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Full Name -->
+                <div class="flex flex-col space-y-2">
+                    <label class="text-[11px] tracking-wider uppercase text-gold-dark font-semibold">Full Name *</label>
+                    <input type="text" name="first_name" placeholder="e.g. Muhammad Ahmad" required 
+                           class="bg-cream/40 border border-gold/30 rounded-md px-4 py-3 text-sm text-ink placeholder-ink/40 focus:outline-none focus:border-gold transition">
+                </div>
+
+                <!-- Phone Number -->
+                <div class="flex flex-col space-y-2">
+                    <label class="text-[11px] tracking-wider uppercase text-gold-dark font-semibold">Phone / WhatsApp Number *</label>
+                    <input type="tel" name="phone" placeholder="e.g. 0300-1234567" required 
+                           class="bg-cream/40 border border-gold/30 rounded-md px-4 py-3 text-sm text-ink placeholder-ink/40 focus:outline-none focus:border-gold transition">
+                    <span class="text-[10px] text-ink/40 font-light">We will contact you on this number to confirm the order delivery.</span>
+                </div>
+
+                <!-- Complete Address -->
+                <div class="flex flex-col space-y-2">
+                    <label class="text-[11px] tracking-wider uppercase text-gold-dark font-semibold">Complete Shipping Address *</label>
+                    <textarea name="address" rows="3" placeholder="House / Street Number, Area, Landmark" required 
+                              class="bg-cream/40 border border-gold/30 rounded-md px-4 py-3 text-sm text-ink placeholder-ink/40 focus:outline-none focus:border-gold transition"></textarea>
+                </div>
+
+                <!-- City -->
+                <div class="flex flex-col space-y-2">
+                    <label class="text-[11px] tracking-wider uppercase text-gold-dark font-semibold">City *</label>
+                    <input type="text" name="city" placeholder="Karachi, Lahore, Rawalpindi, Peshawar, etc." required 
+                           class="bg-cream/40 border border-gold/30 rounded-md px-4 py-3 text-sm text-ink placeholder-ink/40 focus:outline-none focus:border-gold transition">
+                </div>
+
+                <!-- Payment Method (COD Announcement) -->
+                <div class="pt-4 border-t border-gold/10 space-y-2">
+                    <span class="text-[11px] tracking-wider uppercase text-gold-dark font-semibold">Payment Method</span>
+                    <div class="flex items-center gap-3 p-4 bg-gold/10 border border-gold/30 rounded-md">
+                        <div class="w-4 h-4 rounded-full bg-gold flex items-center justify-center">
+                            <div class="w-2 h-2 rounded-full bg-ink"></div>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-ink block">Cash on Delivery (COD)</span>
+                            <span class="text-[11px] text-ink/70 font-light">Zero advance payment required. Pay cash when package arrives.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-4">
+                    <button type="submit" class="btn-gold w-full bg-ink text-cream py-4 text-[11px] tracking-[0.2em] uppercase font-semibold border border-ink hover:bg-gold hover:text-ink transition shadow-md cursor-pointer">
+                        Place Order (Cash on Delivery) 📦
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- RIGHT: Order Review Card (40% Width) -->
+        <div class="lg:col-span-5 bg-white/10 backdrop-blur-sm border border-gold/15 p-8 rounded-lg space-y-6">
+            <h3 class="font-serif text-2xl italic text-ink border-b border-gold/10 pb-4">Order Review</h3>
+            
+            {% if cart %}
+            <div class="space-y-4">
+                {% for item in cart %}
+                <div class="flex items-center gap-4 py-3 border-b border-gold/10">
+                    <div class="w-14 h-14 bg-ink overflow-hidden flex-shrink-0 relative">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center text-cream/20 text-xl">☪</div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow space-y-0.5">
+                        <h4 class="font-serif text-lg italic text-ink">{{ item.product.name }}</h4>
+                        <p class="text-xs text-ink/50 font-light">Qty: {{ item.quantity }} · Rs. {{ item.price|floatformat:0 }}</p>
+                    </div>
+                    <span class="text-sm font-semibold text-ink">Rs. {{ item.total_price|floatformat:0 }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Price Calculations -->
+            <div class="space-y-3 text-xs font-light text-ink/80 pt-2">
+                <div class="flex justify-between">
+                    <span>Subtotal</span>
+                    <span class="font-medium text-ink">Rs. {{ subtotal|floatformat:0 }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Shipping Fee</span>
+                    <span class="font-medium text-ink">
+                        {% if shipping_fee == 0 %}
+                            <span class="text-forest font-semibold">FREE</span>
+                        {% else %}
+                            Rs. {{ shipping_fee|floatformat:0 }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="border-t border-gold/15 pt-4 flex justify-between text-base font-bold text-ink">
+                    <span>Total Payable</span>
+                    <span class="text-lg text-ink">Rs. {{ grand_total|floatformat:0 }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===== ISLAMIC DIVIDER ===== -->
+<div class="islamic-divider">
+    <div class="line"></div>
+    <div class="ornament">✦</div>
+    <div class="line"></div>
+</div>
+
+{% endblock %}
