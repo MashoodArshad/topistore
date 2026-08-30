@@ -4,11 +4,139 @@
 
 {% block content %}
 
-<!-- ===== HIGH-IMPACT HERO SECTION ===== -->
+<!-- ===== HERO SECTION WITH DUAL-COLOR GLOWING MOSQUE LAMPS ===== -->
 <section class="relative min-h-[85vh] flex items-center justify-center px-5 sm:px-8 overflow-hidden bg-gradient-to-b from-white to-slate-100 border-b border-slate-200">
+    
+    <!-- 🕌 LEFT BACKGROUND ART: EMERALD PILLAR + GLOWING GOLD LAMP -->
+    <div class="absolute left-0 bottom-0 top-0 w-[24%] hidden lg:block opacity-[0.55] pointer-events-none select-none">
+        <svg class="w-full h-full" viewBox="0 0 250 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Radial Gradient for Left Glowing Light Effect -->
+            <defs>
+                <radialGradient id="left-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FFF7D6" stop-opacity="1"/>
+                    <stop offset="25%" stop-color="#FFD54F" stop-opacity="0.95"/>
+                    <stop offset="65%" stop-color="#B88E44" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#B88E44" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+
+            <!-- Pillars (Deep Dark Emerald Green) -->
+            <path d="M40 800V280M60 800V280M50 800V280" stroke="#043E2E" stroke-width="3.5"/>
+            
+            <!-- Pedestal/Base (Gold + Emerald) -->
+            <path d="M30 800h40v-18H30z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            <path d="M22 782h56v-12H22z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"/>
+            
+            <!-- Column Capital (Gold + Emerald) -->
+            <path d="M35 280h30l6-24H29l6 24z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            <path d="M20 256h60v-10H20z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"/>
+            
+            <!-- Mihrab Arch Sweeping to Top-Right (Solid Bold Gold) -->
+            <path d="M50 246C90 170 160 85 250 65" stroke="#B88E44" stroke-width="4" stroke-linecap="round"/>
+            <path d="M50 246C75 130 140 70 250 70" stroke="#043E2E" stroke-width="2" stroke-dasharray="6 4"/>
+            
+            <!-- ========================================== -->
+            <!-- 🌟 GLOWING GOLD LAMP (FANOUS) SYSTEM -->
+            <!-- ========================================== -->
+            <!-- Radiant Glow Aura (Shining Circle behind lantern) -->
+            <circle cx="120" cy="225" r="38" fill="url(#left-glow)"/>
+            
+            <!-- Chain hanging from the Arch -->
+            <line x1="120" y1="145" x2="120" y2="200" stroke="#B88E44" stroke-width="2.5"/>
+            
+            <!-- Lantern Top Cap -->
+            <path d="M105 200h30l-5-12h-20l-5 12z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            
+            <!-- Lantern Glass Body & Frame -->
+            <path d="M105 200l-8 25 8 25h30l8-25-8-25h-30z" stroke="#B88E44" stroke-width="2.5" fill="none"/>
+            
+            <!-- Grid Slits for light to shine through -->
+            <path d="M110 200v50 M120 200v50 M130 200v50 M97 225h46" stroke="#B88E44" stroke-width="1.5"/>
+            
+            <!-- Lantern Bottom Ring & Tip -->
+            <path d="M112 250h16v6h-16z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            <path d="M120 256l-3 10 3 5 3-5-3-10z" fill="#B88E44" stroke="#043E2E" stroke-width="1"/>
+            <!-- ========================================== -->
+
+            <!-- Islamic Star & Diamond Motifs on Pillar -->
+            <path d="M50 380l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"/>
+            <path d="M50 500l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"/>
+            <path d="M50 620l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"/>
+            
+            <!-- Horizontal Gridlines -->
+            <line x1="0" y1="120" x2="250" y2="120" stroke="#043E2E" stroke-width="1.5" stroke-dasharray="6 6"/>
+            <line x1="0" y1="55" x2="250" y2="55" stroke="#B88E44" stroke-width="1.5"/>
+        </svg>
+    </div>
+
+    <!-- 🕌 RIGHT BACKGROUND ART: EMERALD PILLAR + GLOWING GOLD LAMP -->
+    <div class="absolute right-0 bottom-0 top-0 w-[24%] hidden lg:block opacity-[0.55] pointer-events-none select-none">
+        <svg class="w-full h-full" viewBox="0 0 250 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Radial Gradient for Right Glowing Light Effect -->
+            <defs>
+                <radialGradient id="right-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FFF7D6" stop-opacity="1"/>
+                    <stop offset="25%" stop-color="#FFD54F" stop-opacity="0.95"/>
+                    <stop offset="65%" stop-color="#B88E44" stop-opacity="0.5"/>
+                    <stop offset="100%" stop-color="#B88E44" stop-opacity="0"/>
+                </radialGradient>
+            </defs>
+
+            <!-- Pillars (Deep Dark Emerald Green) -->
+            <path d="M210 800V280M190 800V280M200 800V280" stroke="#043E2E" stroke-width="3.5"/>
+            
+            <!-- Pedestal/Base (Gold + Emerald) -->
+            <path d="M180 800h40v-18h-40z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            <path d="M172 782h56v-12h-56z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"/>
+            
+            <!-- Column Capital (Gold + Emerald) -->
+            <path d="M185 280h30l6-24h-42l6 24z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            <path d="M170 256h60v-10h-60z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"/>
+            
+            <!-- Mihrab Arch Sweeping to Top-Left (Solid Bold Gold) -->
+            <path d="M200 246C160 170 90 85 0 65" stroke="#B88E44" stroke-width="4" stroke-linecap="round"/>
+            <path d="M200 246C175 130 110 70 0 70" stroke="#043E2E" stroke-width="2" stroke-dasharray="6 4"/>
+            
+            <!-- ========================================== -->
+            <!-- 🌟 GLOWING GOLD LAMP (FANOUS) SYSTEM -->
+            <!-- ========================================== -->
+            <!-- Radiant Glow Aura (Shining Circle behind lantern) -->
+            <circle cx="130" cy="225" r="38" fill="url(#right-glow)"/>
+            
+            <!-- Chain hanging from the Arch -->
+            <line x1="130" y1="145" x2="130" y2="200" stroke="#B88E44" stroke-width="2.5"/>
+            
+            <!-- Lantern Top Cap -->
+            <path d="M115 200h30l-5-12h-20l-5 12z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            
+            <!-- Lantern Glass Body & Frame -->
+            <path d="M115 200l-8 25 8 25h30l8-25-8-25h-30z" stroke="#B88E44" stroke-width="2.5" fill="none"/>
+            
+            <!-- Grid Slits for light to shine through -->
+            <path d="M120 200v50 M130 200v50 M140 200v50 M107 225h46" stroke="#B88E44" stroke-width="1.5"/>
+            
+            <!-- Lantern Bottom Ring & Tip -->
+            <path d="M122 250h16v6h-16z" fill="#043E2E" stroke="#B88E44" stroke-width="2"/>
+            <path d="M130 256l-3 10 3 5 3-5-3-10z" fill="#B88E44" stroke="#043E2E" stroke-width="1"/>
+            <!-- ========================================== -->
+
+            <!-- Islamic Star & Diamond Motifs on Pillar -->
+            <path d="M200 380l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"/>
+            <path d="M200 500l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"/>
+            <path d="M200 620l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"/>
+            
+            <!-- Horizontal Gridlines -->
+            <line x1="0" y1="120" x2="250" y2="120" stroke="#043E2E" stroke-width="1.5" stroke-dasharray="6 6"/>
+            <line x1="0" y1="55" x2="250" y2="55" stroke="#B88E44" stroke-width="1.5"/>
+        </svg>
+    </div>
+    
+    
+
+    <!-- MAIN CONTENT -->
     <div class="max-w-4xl mx-auto text-center relative z-10 py-16">
         
-        <span class="text-xs font-black tracking-[0.3em] uppercase text-emerald-800 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 inline-block mb-6">
+        <span class="text-xs font-black tracking-[0.3em] uppercase text-emerald-800 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 inline-block mb-6 shadow-sm">
             ESTABLISHED 2025 · THE EXCLUSIVE COLLECTION
         </span>
         
@@ -34,6 +162,43 @@
 
     </div>
 </section>
+    <!-- ========================================================== -->
+    <!-- 🕌 HORIZONTAL ANCIENT ISLAMIC GEOMETRIC FRIEZE BORDER ===== -->
+    <!-- ========================================================== -->
+    <div class="w-full h-6 bg-[#043E2E] relative overflow-hidden border-b border-[#C5A880]/30 z-40 select-none pointer-events-none shadow-md">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Complex Interlocking Islamic Geometric Pattern (40px width repeating) -->
+                <pattern id="ancient-girih" width="40" height="24" patternUnits="userSpaceOnUse">
+                    <!-- Base horizontal guide lines -->
+                    <line x1="0" y1="12" x2="40" y2="12" stroke="#C5A880" stroke-width="0.5" opacity="0.3"/>
+                    
+                    <!-- Interlocking Diamonds (Gold Paths) -->
+                    <path d="M0 12 L10 2 L20 12 L10 22 Z M20 12 L30 2 L40 12 L30 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"/>
+                    <path d="M10 12 L20 2 L30 12 L20 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"/>
+                    
+                    <!-- Inner Geometric Squares (Emerald/Gold weaves) -->
+                    <rect x="7" y="9" width="6" height="6" transform="rotate(45 10 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"/>
+                    <rect x="27" y="9" width="6" height="6" transform="rotate(45 30 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"/>
+
+                    <!-- Star Center Accents (Antique Gold Rings) -->
+                    <circle cx="10" cy="12" r="2" fill="#B88E44"/>
+                    <circle cx="30" cy="12" r="2" fill="#B88E44"/>
+                    
+                    <!-- Crimson Red Core Heart Dots (Perfect Bold Red Pop) -->
+                    <circle cx="10" cy="12" r="1" fill="#DC2626"/>
+                    <circle cx="30" cy="12" r="1" fill="#DC2626"/>
+
+                    <!-- Outer Border Guides -->
+                    <line x1="0" y1="1" x2="40" y2="1" stroke="#C5A880" stroke-width="0.75" opacity="0.5"/>
+                    <line x1="0" y1="23" x2="40" y2="23" stroke="#C5A880" stroke-width="0.75" opacity="0.5"/>
+                </pattern>
+            </defs>
+            <!-- Render the pattern horizontally infinitely -->
+            <rect width="100%" height="100%" fill="url(#ancient-girih)" />
+        </svg>
+    </div>
+    <!-- ========================================================== -->
 
 <!-- ===== SIGNATURE ARTICLES SHELF (DYNAMICS) ===== -->
 <section class="max-w-7xl mx-auto px-5 sm:px-8 py-20">

@@ -27,7 +27,7 @@
                             dark: '#0B0F19',      // Deep Obsidian Black
                             emerald: '#064E3B',   // Rich Emerald Accent
                             red: '#DC2626',       // Vibrant Bold Red
-                            canvas: '#F1F5F9',    // Clean Cool Slate Gray (No more dull yellow/cream!)
+                            canvas: '#F1F5F9',    // Clean Cool Slate Gray
                             card: '#FFFFFF',      // Pure Crisp White
                             border: '#E2E8F0',    // Clean Modern Border
                             muted: '#64748B',     // Slate Grey
@@ -68,7 +68,7 @@
 <body class="antialiased selection:bg-red-600 selection:text-white">
 
     <!-- ===== TOP NOTIFICATION STRIP ===== -->
-    <div class="bg-brand-dark text-white text-[11px] font-bold tracking-widest uppercase py-2.5 px-4 text-center border-b border-slate-800">
+    <div class="bg-brand-dark text-white text-[11px] font-bold tracking-widest uppercase py-2.5 px-4 text-center border-b border-slate-800 relative z-50">
         ⚡ FREE SHIPPING ON ORDERS ABOVE RS. 5,000 · CASH ON DELIVERY ACROSS PAKISTAN
     </div>
 
@@ -138,8 +138,58 @@
         </div>
     </header>
 
+    <!-- ========================================================== -->
+    <!-- 🕌 HORIZONTAL ANCIENT ISLAMIC GEOMETRIC FRIEZE BORDER ===== -->
+    <!-- ========================================================== -->
+    <div class="w-full h-6 bg-[#043E2E] relative overflow-hidden border-b border-[#C5A880]/30 z-40 select-none pointer-events-none shadow-sm">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <!-- Complex Interlocking Islamic Geometric Pattern (40px width repeating) -->
+                <pattern id="ancient-girih" width="40" height="24" patternUnits="userSpaceOnUse">
+                    <!-- Base horizontal guide lines -->
+                    <line x1="0" y1="12" x2="40" y2="12" stroke="#C5A880" stroke-width="0.5" opacity="0.3"/>
+                    
+                    <!-- Interlocking Diamonds (Gold Paths) -->
+                    <path d="M0 12 L10 2 L20 12 L10 22 Z M20 12 L30 2 L40 12 L30 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"/>
+                    <path d="M10 12 L20 2 L30 12 L20 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"/>
+                    
+                    <!-- Inner Geometric Squares -->
+                    <rect x="7" y="9" width="6" height="6" transform="rotate(45 10 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"/>
+                    <rect x="27" y="9" width="6" height="6" transform="rotate(45 30 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"/>
+
+                    <!-- Star Center Accents (Antique Gold Rings) -->
+                    <circle cx="10" cy="12" r="2" fill="#B88E44"/>
+                    <circle cx="30" cy="12" r="2" fill="#B88E44"/>
+                    
+                    <!-- Crimson Red Core Heart Dots (Perfect Bold Red Pop) -->
+                    <circle cx="10" cy="12" r="1" fill="#DC2626"/>
+                    <circle cx="30" cy="12" r="1" fill="#DC2626"/>
+
+                    <!-- Outer Border Guides -->
+                    <line x1="0" y1="1" x2="40" y2="1" stroke="#C5A880" stroke-width="0.75" opacity="0.5"/>
+                    <line x1="0" y1="23" x2="40" y2="23" stroke="#C5A880" stroke-width="0.75" opacity="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#ancient-girih)" />
+        </svg>
+    </div>
+    <!-- ========================================================== -->
+
     <!-- ===== MAIN CONTENT ===== -->
     <main class="min-h-screen">
+        {% if messages %}
+        <div class="max-w-3xl mx-auto px-5 mt-5 space-y-2">
+            {% for message in messages %}
+            <div class="text-sm px-4 py-3 rounded-lg border
+                {% if message.tags == 'error' %}bg-red-50 text-red-700 border-red-200
+                {% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border-amber-200
+                {% else %}bg-green-50 text-green-700 border-green-200{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block content %}{% endblock %}
     </main>
 
