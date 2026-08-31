@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Shah G Cap House — Premium Islamic Caps{% endblock %}</title>
 
-    <!-- Google Modern Fonts: Outfit (Bold Modern Fashion Font) + Inter -->
+    <!-- Google Modern Fonts: Outfit + Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@700&display=swap" rel="stylesheet">
@@ -43,6 +43,8 @@
             background-color: #F1F5F9;
             color: #0B0F19;
             font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            position: relative;
         }
 
         /* Urdu Signature */
@@ -62,10 +64,41 @@
             transform: translateY(-6px);
             box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
         }
+
+        /* Content sits above global background texture */
+        header, main, footer {
+            position: relative;
+            z-index: 10;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="antialiased selection:bg-red-600 selection:text-white">
+
+    <!-- ========================================================== -->
+    <!-- 🕌 GLOBAL PERMANENT ISLAMIC GEOMETRIC BACKGROUND TEXTURE === -->
+    <!-- ========================================================== -->
+    <div class="fixed inset-0 w-full h-full pointer-events-none select-none z-0 opacity-[0.09]">
+        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="global-islamic-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+                    <!-- Outer Emerald Diamond -->
+                    <path d="M30 0L60 30L30 60L0 30Z" stroke="#043E2E" stroke-width="1.2" fill="none"></path>
+                    <!-- Inner Gold Diamond -->
+                    <path d="M30 10L50 30L30 50L10 30Z" stroke="#B88E44" stroke-width="0.9" fill="none"></path>
+                    <!-- Center Gold Star Node -->
+                    <circle cx="30" cy="30" r="3" fill="#B88E44"></circle>
+                    <!-- Corner Emerald Anchor Nodes -->
+                    <circle cx="0" cy="0" r="2" fill="#043E2E"></circle>
+                    <circle cx="60" cy="0" r="2" fill="#043E2E"></circle>
+                    <circle cx="0" cy="60" r="2" fill="#043E2E"></circle>
+                    <circle cx="60" cy="60" r="2" fill="#043E2E"></circle>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#global-islamic-pattern)"></rect>
+        </svg>
+    </div>
+    <!-- ========================================================== -->
 
     <!-- ===== TOP NOTIFICATION STRIP ===== -->
     <div class="bg-brand-dark text-white text-[11px] font-bold tracking-widest uppercase py-2.5 px-4 text-center border-b border-slate-800 relative z-50">
@@ -77,7 +110,7 @@
         <div class="max-w-7xl mx-auto px-5 sm:px-8">
             <div class="flex items-center justify-between h-20">
 
-                <!-- Brand Logo (Punchy High-Contrast) -->
+                <!-- Brand Logo -->
                 <a href="{% url 'core:home' %}" class="flex items-center gap-3 group">
                     <div class="w-11 h-11 bg-brand-dark rounded-xl flex items-center justify-center text-white font-black text-lg shadow-md group-hover:bg-brand-emerald transition-colors">
                         SG
@@ -108,7 +141,7 @@
                         شاہ جی کیپ ہاؤس
                     </div>
 
-                    <!-- Cart Button (Punchy Red Badge) -->
+                    <!-- Cart Button -->
                     <a href="{% url 'cart:cart_detail' %}" class="relative p-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl text-brand-dark transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -138,42 +171,27 @@
         </div>
     </header>
 
-    <!-- ========================================================== -->
-    <!-- 🕌 HORIZONTAL ANCIENT ISLAMIC GEOMETRIC FRIEZE BORDER ===== -->
-    <!-- ========================================================== -->
+    <!-- ===== BROWSER-SAFE HORIZONTAL ANCIENT GIRIH BORDER ===== -->
     <div class="w-full h-6 bg-[#043E2E] relative overflow-hidden border-b border-[#C5A880]/30 z-40 select-none pointer-events-none shadow-sm">
         <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <!-- Complex Interlocking Islamic Geometric Pattern (40px width repeating) -->
                 <pattern id="ancient-girih" width="40" height="24" patternUnits="userSpaceOnUse">
-                    <!-- Base horizontal guide lines -->
-                    <line x1="0" y1="12" x2="40" y2="12" stroke="#C5A880" stroke-width="0.5" opacity="0.3"/>
-                    
-                    <!-- Interlocking Diamonds (Gold Paths) -->
-                    <path d="M0 12 L10 2 L20 12 L10 22 Z M20 12 L30 2 L40 12 L30 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"/>
-                    <path d="M10 12 L20 2 L30 12 L20 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"/>
-                    
-                    <!-- Inner Geometric Squares -->
-                    <rect x="7" y="9" width="6" height="6" transform="rotate(45 10 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"/>
-                    <rect x="27" y="9" width="6" height="6" transform="rotate(45 30 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"/>
-
-                    <!-- Star Center Accents (Antique Gold Rings) -->
-                    <circle cx="10" cy="12" r="2" fill="#B88E44"/>
-                    <circle cx="30" cy="12" r="2" fill="#B88E44"/>
-                    
-                    <!-- Crimson Red Core Heart Dots (Perfect Bold Red Pop) -->
-                    <circle cx="10" cy="12" r="1" fill="#DC2626"/>
-                    <circle cx="30" cy="12" r="1" fill="#DC2626"/>
-
-                    <!-- Outer Border Guides -->
-                    <line x1="0" y1="1" x2="40" y2="1" stroke="#C5A880" stroke-width="0.75" opacity="0.5"/>
-                    <line x1="0" y1="23" x2="40" y2="23" stroke="#C5A880" stroke-width="0.75" opacity="0.5"/>
+                    <line x1="0" y1="12" x2="40" y2="12" stroke="#C5A880" stroke-width="0.5" opacity="0.3"></line>
+                    <path d="M0 12 L10 2 L20 12 L10 22 Z M20 12 L30 2 L40 12 L30 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"></path>
+                    <path d="M10 12 L20 2 L30 12 L20 22 Z" stroke="#C5A880" stroke-width="1.2" fill="none" opacity="0.85"></path>
+                    <rect x="7" y="9" width="6" height="6" transform="rotate(45 10 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"></rect>
+                    <rect x="27" y="9" width="6" height="6" transform="rotate(45 30 12)" stroke="#C5A880" stroke-width="0.8" fill="none" opacity="0.6"></rect>
+                    <circle cx="10" cy="12" r="2" fill="#B88E44"></circle>
+                    <circle cx="30" cy="12" r="2" fill="#B88E44"></circle>
+                    <circle cx="10" cy="12" r="1" fill="#DC2626"></circle>
+                    <circle cx="30" cy="12" r="1" fill="#DC2626"></circle>
+                    <line x1="0" y1="1" x2="40" y2="1" stroke="#C5A880" stroke-width="0.75" opacity="0.5"></line>
+                    <line x1="0" y1="23" x2="40" y2="23" stroke="#C5A880" stroke-width="0.75" opacity="0.5"></line>
                 </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#ancient-girih)" />
+            <rect width="100%" height="100%" fill="url(#ancient-girih)"></rect>
         </svg>
     </div>
-    <!-- ========================================================== -->
 
     <!-- ===== MAIN CONTENT ===== -->
     <main class="min-h-screen">
@@ -193,12 +211,11 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- ===== CRISP HIGH-CONTRAST FOOTER ===== -->
+    <!-- ===== FOOTER ===== -->
     <footer class="bg-brand-dark text-white pt-16 pb-10 mt-24 border-t-4 border-brand-emerald">
         <div class="max-w-7xl mx-auto px-5 sm:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
                 
-                <!-- Col 1 -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-brand-emerald rounded-lg flex items-center justify-center text-white font-black text-lg">
@@ -211,7 +228,6 @@
                     </p>
                 </div>
 
-                <!-- Col 2 -->
                 <div>
                     <h4 class="text-xs font-black uppercase tracking-widest text-slate-300 mb-4">Quick Links</h4>
                     <ul class="space-y-2.5 text-xs text-slate-400 font-medium">
@@ -222,7 +238,6 @@
                     </ul>
                 </div>
 
-                <!-- Col 3 -->
                 <div>
                     <h4 class="text-xs font-black uppercase tracking-widest text-slate-300 mb-4">Trust & Guarantee</h4>
                     <ul class="space-y-2.5 text-xs text-slate-400 font-medium">
@@ -232,7 +247,6 @@
                     </ul>
                 </div>
 
-                <!-- Col 4 -->
                 <div>
                     <h4 class="text-xs font-black uppercase tracking-widest text-slate-300 mb-4">Direct Contact</h4>
                     <ul class="space-y-2.5 text-xs text-slate-400 font-medium">

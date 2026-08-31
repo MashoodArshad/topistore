@@ -57,9 +57,17 @@
             </ul>
         </div>
 
-        <p class="text-xs text-slate-500 font-medium italic">
-            Estimated delivery time is 2–4 business days across Pakistan.
-        </p>
+        <!-- 💬 1-CLICK DIRECT WHATSAPP CONFIRMATION BUTTON -->
+        <div class="pt-2 p-6 bg-emerald-50 border-2 border-emerald-500 rounded-2xl space-y-3">
+            <span class="text-xs font-black uppercase tracking-wider text-emerald-900 block">Want Fast Dispatch?</span>
+            <p class="text-xs text-slate-600 font-medium">Click below to send your Order #{{ order.id }} details directly to our WhatsApp team for instant confirmation!</p>
+            <a href="https://wa.me/923297185977?text=Assalamu%20Alaikum!%20I%20have%20placed%20Order%20%23{{ order.id }}%20on%20Shah%20G%20Cap%20House.%0AName:%20{{ order.first_name }}%0ACity:%20{{ order.city }}%0ATotal:%20Rs.%20{{ order.total_cost|floatformat:0 }}" 
+               target="_blank" rel="noopener noreferrer"
+               class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition shadow-md">
+                <span>💬 Confirm on WhatsApp (+92 329 7185977)</span>
+                <span>↗</span>
+            </a>
+        </div>
 
         <div class="pt-4">
             <a href="{% url 'products:product_list' %}" class="inline-block bg-slate-900 hover:bg-emerald-900 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-xl transition shadow">
