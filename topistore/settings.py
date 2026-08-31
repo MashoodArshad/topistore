@@ -148,3 +148,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'mashoodarshad22@gmail.com')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = f"Shah G Cap House <{EMAIL_HOST_USER}>"
+EMAIL_TIMEOUT = 5  # Seconds timeout so it never hangs
