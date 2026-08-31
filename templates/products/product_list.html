@@ -63,7 +63,6 @@
             <div class="pt-4 border-t border-slate-100">
                 <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Filter by Category:</span>
                 <div class="flex flex-wrap gap-2">
-                    
                     <a href="{% url 'products:product_list' %}" 
                        class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-[9px] sm:text-xs font-black uppercase tracking-wider border-2 transition
                        {% if not selected_category %}bg-brand-emerald border-brand-emerald text-white{% else %}border-slate-300 text-slate-700 hover:border-slate-900 bg-white{% endif %}">
@@ -77,7 +76,6 @@
                         {{ cat.name }}
                     </a>
                     {% endfor %}
-
                 </div>
             </div>
 
@@ -97,7 +95,7 @@
 
     </div>
 
-    <!-- ===== 📱 2-COLUMN RESPONSIVE GRID ===== -->
+    <!-- ===== 📱 2-COLUMN RESPONSIVE GRID (ZERO BLACK BOXES) ===== -->
     {% if products %}
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
         
@@ -105,13 +103,14 @@
         <div class="modern-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
             
             <a href="/products/{{ product.slug }}/" class="block">
-                <!-- Product Image Box -->
-                <div class="relative aspect-square bg-slate-950 overflow-hidden">
+                <!-- 📸 SOFT NEUTRAL SKELETON (NO BLACK BOX) -->
+                <div class="relative aspect-square bg-slate-100 overflow-hidden">
                     {% if product.image %}
                         <img src="{{ product.image.url }}" alt="{{ product.name }}" 
+                             loading="eager" decoding="async"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                     {% else %}
-                        <div class="w-full h-full flex items-center justify-center text-slate-700 text-2xl">☪</div>
+                        <div class="w-full h-full flex items-center justify-center text-slate-400 text-2xl">☪</div>
                     {% endif %}
 
                     <!-- Save Discount Pill -->
@@ -127,19 +126,17 @@
                     </span>
                 </div>
 
-                <!-- Product Details Box (Tight padding on Mobile) -->
+                <!-- Product Details Box -->
                 <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-3">
                     <span class="text-[8px] sm:text-[10px] font-extrabold tracking-widest text-emerald-800 uppercase block">
                         {{ product.category.name }}
                     </span>
                     
-                    <!-- BOLD BLACK TITLE (Optimized sizing) -->
                     <h3 class="text-sm sm:text-xl font-black tracking-tight text-slate-900 uppercase group-hover:text-emerald-800 transition line-clamp-1">
                         {{ product.name }}
                     </h3>
 
-                    <!-- BOLD RED PRICES (Optimized sizing) -->
-                    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-3">
+                    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-3 pt-1">
                         <span class="text-base sm:text-2xl font-black text-red-600 tracking-tight">
                             Rs. {{ product.price|floatformat:0 }}
                         </span>
@@ -152,7 +149,7 @@
                 </div>
             </a>
 
-            <!-- Action Button (Sleek and touch-friendly on Mobile) -->
+            <!-- Action Button -->
             <div class="p-3 sm:p-5 pt-0">
                 <a href="/products/{{ product.slug }}/" 
                    class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-extrabold text-[9px] sm:text-xs uppercase tracking-widest py-2.5 sm:py-3.5 rounded-xl flex items-center justify-center gap-1 sm:gap-2 transition-colors shadow-sm">
