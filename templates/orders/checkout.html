@@ -4,19 +4,18 @@
 
 {% block content %}
 
-<div class="max-w-7xl mx-auto px-5 sm:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
     
-    <!-- Title Header -->
-    <div class="pb-6 border-b-2 border-slate-200 mb-10">
-        <span class="text-xs font-black uppercase tracking-widest text-emerald-800 block mb-1">Final Step</span>
-        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">Checkout Details</h1>
+    <div class="pb-6 border-b-2 border-slate-200 mb-8">
+        <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-emerald-800 block mb-1">Final Step</span>
+        <h1 class="text-2xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">Checkout Details</h1>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
         
-        <!-- LEFT: Delivery Information Form (7 Columns) -->
-        <div class="lg:col-span-7 bg-white border border-slate-200 p-6 sm:p-10 rounded-3xl shadow-sm">
-            <h3 class="text-xl font-black uppercase tracking-tight text-slate-900 mb-6">Delivery Address</h3>
+        <!-- LEFT: Delivery Form (7 Columns) -->
+        <div class="lg:col-span-7 bg-white border border-slate-200 p-5 sm:p-10 rounded-3xl shadow-sm">
+            <h3 class="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 mb-6">Delivery Address</h3>
             
             <form method="post" action="{% url 'orders:checkout' %}" class="space-y-5">
                 {% csrf_token %}
@@ -24,33 +23,41 @@
                 <!-- Full Name -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-black uppercase tracking-wider text-slate-700">Full Name *</label>
-                    <input type="text" name="first_name" placeholder="e.g. Muhammad Ahmad" required 
-                           class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition">
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <p class="text-[11px] text-red-600 font-bold">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
-                <!-- Phone Number -->
+                <!-- Phone -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-black uppercase tracking-wider text-slate-700">Phone / WhatsApp Number *</label>
-                    <input type="tel" name="phone" placeholder="0300-1234567" required 
-                           class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition">
-                    <span class="text-[11px] text-slate-400 font-medium block">We will contact you on this number to confirm delivery.</span>
+                    <label class="text-xs font-black uppercase tracking-wider text-slate-700">Phone / WhatsApp *</label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                    <p class="text-[11px] text-red-600 font-bold">{{ form.phone.errors.0 }}</p>
+                    {% endif %}
+                    <span class="text-[10px] text-slate-400 font-medium block">Pakistani mobile number (e.g. 0300-1234567)</span>
                 </div>
 
-                <!-- Complete Address -->
+                <!-- Address -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-black uppercase tracking-wider text-slate-700">Complete Shipping Address *</label>
-                    <textarea name="address" rows="3" placeholder="House / Street Number, Area, Landmark" required 
-                              class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition"></textarea>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                    <p class="text-[11px] text-red-600 font-bold">{{ form.address.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
                 <!-- City -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-black uppercase tracking-wider text-slate-700">City *</label>
-                    <input type="text" name="city" placeholder="Karachi, Lahore, Islamabad, Peshawar, etc." required 
-                           class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition">
+                    {{ form.city }}
+                    {% if form.city.errors %}
+                    <p class="text-[11px] text-red-600 font-bold">{{ form.city.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
-                <!-- Payment Method (COD Announcement) -->
+                <!-- Payment Method -->
                 <div class="pt-4 border-t border-slate-200 space-y-2">
                     <span class="text-xs font-black uppercase tracking-wider text-slate-700">Payment Method</span>
                     <div class="flex items-center gap-3 p-4 bg-emerald-50 border-2 border-emerald-500 rounded-2xl">
@@ -62,7 +69,6 @@
                     </div>
                 </div>
 
-                <!-- Submit Button -->
                 <div class="pt-4">
                     <button type="submit" 
                             class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-black text-xs uppercase tracking-widest py-4.5 rounded-xl transition shadow-md cursor-pointer">
@@ -72,17 +78,17 @@
             </form>
         </div>
 
-        <!-- RIGHT: Order Review Card (5 Columns) -->
-        <div class="lg:col-span-5 bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
-            <h3 class="text-xl font-black uppercase tracking-tight text-slate-900 border-b border-slate-200 pb-4">
+        <!-- RIGHT: Order Review (5 Columns) -->
+        <div class="lg:col-span-5 bg-white border border-slate-200 p-5 sm:p-8 rounded-3xl shadow-sm space-y-5 sm:space-y-6 sticky top-28">
+            <h3 class="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 border-b border-slate-200 pb-4">
                 Order Review
             </h3>
             
             {% if cart %}
-            <div class="space-y-4">
+            <div class="space-y-3">
                 {% for item in cart %}
-                <div class="flex items-center gap-4 py-2 border-b border-slate-100">
-                    <div class="w-14 h-14 bg-slate-950 rounded-lg overflow-hidden flex-shrink-0">
+                <div class="flex items-center gap-3 py-2 border-b border-slate-100">
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 bg-slate-950 rounded-lg overflow-hidden flex-shrink-0">
                         {% if item.product.image %}
                             <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
                         {% else %}
@@ -90,37 +96,35 @@
                         {% endif %}
                     </div>
                     <div class="flex-grow">
-                        <h4 class="font-black text-sm text-slate-900 uppercase">{{ item.product.name }}</h4>
-                        <p class="text-xs font-bold text-slate-500">Qty: {{ item.quantity }} · Rs. {{ item.price|floatformat:0 }}</p>
+                        <h4 class="font-black text-xs sm:text-sm text-slate-900 uppercase">{{ item.product.name }}</h4>
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-500">Qty: {{ item.quantity }} · Rs. {{ item.price|floatformat:0 }}</p>
                     </div>
-                    <span class="text-sm font-black text-slate-900">Rs. {{ item.total_price|floatformat:0 }}</span>
+                    <span class="text-xs sm:text-sm font-black text-slate-900">Rs. {{ item.total_price|floatformat:0 }}</span>
                 </div>
                 {% endfor %}
             </div>
 
-            <!-- Total Price Summary -->
             <div class="space-y-2.5 text-xs font-bold text-slate-600 pt-2">
                 <div class="flex justify-between">
                     <span>Subtotal</span>
                     <span class="text-slate-900 font-black">Rs. {{ subtotal|floatformat:0 }}</span>
                 </div>
                 <div class="flex justify-between">
-                    <span>Shipping Fee</span>
+                    <span>Shipping</span>
                     <span>
                         {% if shipping_fee == 0 %}
-                            <span class="text-emerald-700 font-black">FREE SHIPPING</span>
+                            <span class="text-emerald-700 font-black">FREE</span>
                         {% else %}
                             <span class="text-slate-900 font-black">Rs. {{ shipping_fee|floatformat:0 }}</span>
                         {% endif %}
                     </span>
                 </div>
                 <div class="border-t-2 border-slate-200 pt-3 flex justify-between items-baseline">
-                    <span class="text-sm font-black text-slate-900 uppercase">Total Payable</span>
+                    <span class="text-sm font-black text-slate-900 uppercase">Total</span>
                     <span class="text-2xl font-black text-red-600">Rs. {{ grand_total|floatformat:0 }}</span>
                 </div>
             </div>
             {% endif %}
-
         </div>
 
     </div>

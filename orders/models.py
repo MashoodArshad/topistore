@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from products.models import Product
 
@@ -14,17 +15,26 @@ class Order(models.Model):
         ('Canceled', 'Canceled'),
     ]
 
+    # Unique human-readable order number (e.g. SGC-2025-A3F8)
+    order_number = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+        verbose_name="Order Reference"
+    )
+
     first_name = models.CharField(max_length=150, verbose_name="Full Name")
     phone = models.CharField(max_length=20, verbose_name="Phone / WhatsApp Number")
     address = models.TextField(verbose_name="Complete Shipping Address")
     city = models.CharField(max_length=100, verbose_name="City")
-    
+
     # Financial fields
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=150.00)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, help_text="Grand total including shipping")
-    
+
     # Internal order tracking
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    session_key = models.CharField(max_length=40, blank=True, null=True, help_text="For guest order history")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -34,20 +44,30 @@ class Order(models.Model):
         verbose_name_plural = 'Customer Orders'
 
     def __str__(self):
-        return f"Order #{self.id} — {self.first_name} ({self.city})"
+        ref = self.order_number or f"Order #{self.id}"
+        return f"{ref} — {self.first_name} ({self.city})"
+
+    def save(self, *args, **kwargs):
+        """Auto-generate unique order number before saving."""
+        if not self.order_number:
+            short_id = uuid.uuid4().hex[:6].upper()
+            self.order_number = f"SGC-2025-{short_id}"
+        super().save(*args, **kwargs)
 
 
 class OrderItem(models.Model):
     """
     Junction table storing specific products bought inside an order.
+    Price is fetched from DB at time of purchase (NOT from session).
     """
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_items')
-    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price of item at the time of purchase")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price at time of purchase (from DB)")
     quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
-        return f"{self.quantity}x {self.product.name} (Order #{self.order.id})"
+        ref = self.order.order_number or f"Order #{self.order.id}"
+        return f"{self.quantity}x {self.product.name} ({ref})"
 
     def get_cost(self):
         return self.price * self.quantity
