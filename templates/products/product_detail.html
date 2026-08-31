@@ -4,23 +4,24 @@
 
 {% block content %}
 
-<section class="max-w-7xl mx-auto px-5 sm:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
     
     <!-- Breadcrumbs Navigation -->
-    <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 mb-8">
+    <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-black uppercase tracking-wider text-slate-500 mb-6">
         <a href="/" class="hover:text-slate-900 transition">Home</a>
         <span>/</span>
         <a href="{% url 'products:product_list' %}" class="hover:text-slate-900 transition">Collection</a>
         <span>/</span>
-        <span class="text-slate-900">{{ product.name }}</span>
+        <span class="text-slate-900 line-clamp-1">{{ product.name }}</span>
     </div>
 
     <!-- Product Layout Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start">
         
-        <!-- LEFT: Huge High-Definition Image Frame (5 Columns) -->
-        <div class="lg:col-span-6 bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm p-4">
-            <div class="aspect-square bg-slate-950 overflow-hidden rounded-2xl border border-slate-100">
+        <!-- LEFT: Crop-Free Perfectly Scaled Image Frame (6 Columns) -->
+        <div class="lg:col-span-6 bg-white border border-slate-200 rounded-2xl md:rounded-3xl overflow-hidden shadow-sm p-3 md:p-4">
+            <!-- 📸 SQUARE FRAME: Capped at 280px width on Mobile, centered, no cropping at all! -->
+            <div class="w-full max-w-[280px] sm:max-w-[340px] md:max-w-[420px] lg:max-w-none mx-auto aspect-square bg-slate-950 overflow-hidden rounded-xl border border-slate-100 flex items-center justify-center">
                 {% if product.image %}
                     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
                 {% else %}
@@ -30,49 +31,49 @@
         </div>
 
         <!-- RIGHT: Premium Technical Information Box (6 Columns) -->
-        <div class="lg:col-span-6 space-y-6">
+        <div class="lg:col-span-6 space-y-4 sm:space-y-6">
             
-            <div class="border-b border-slate-200 pb-6">
+            <div class="border-b border-slate-200 pb-4 sm:pb-6">
                 <!-- Category -->
-                <span class="text-xs font-black uppercase tracking-[0.2em] text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-md border border-emerald-200 inline-block mb-3">
+                <span class="text-[9px] sm:text-xs font-black uppercase tracking-[0.2em] text-emerald-800 bg-emerald-50 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md border border-emerald-200 inline-block mb-2 sm:mb-3">
                     {{ product.category.name }}
                 </span>
                 
                 <!-- BOLD BLACK TITLE -->
-                <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">
+                <h1 class="text-2xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">
                     {{ product.name }}
                 </h1>
             </div>
 
             <!-- BOLD RED PRICE BLOCK -->
-            <div class="flex items-baseline gap-4">
-                <span class="text-4xl font-black text-red-600 tracking-tight">
+            <div class="flex items-baseline gap-3 sm:gap-4">
+                <span class="text-2xl sm:text-4xl font-black text-red-600 tracking-tight">
                     Rs. {{ product.price|floatformat:0 }}
                 </span>
                 {% if product.original_price %}
-                <span class="text-lg font-bold text-slate-400 line-through">
+                <span class="text-xs sm:text-lg font-bold text-slate-400 line-through">
                     Rs. {{ product.original_price|floatformat:0 }}
                 </span>
                 {% endif %}
                 
                 {% if product.discount_percentage > 0 %}
-                <span class="bg-red-600 text-white text-xs font-black tracking-wider uppercase px-3 py-1.5 rounded-full shadow-sm">
+                <span class="bg-red-600 text-white text-[9px] sm:text-xs font-black tracking-wider uppercase px-2 py-1 sm:px-3 sm:py-1.5 rounded-full shadow-sm">
                     Save {{ product.discount_percentage }}% OFF
                 </span>
                 {% endif %}
             </div>
 
             <!-- Dynamic Stock & Delivery Info -->
-            <div class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm space-y-4">
-                <div class="flex items-center gap-3">
+            <div class="bg-white border border-slate-200 p-4 sm:p-5 rounded-2xl shadow-sm space-y-3 sm:space-y-4">
+                <div class="flex items-center gap-3.5">
                     {% if product.stock > 0 %}
                     <span class="w-3 h-3 bg-emerald-500 rounded-full animate-ping"></span>
-                    <p class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">
+                    <p class="text-xs sm:text-sm font-extrabold text-slate-900 uppercase tracking-wider">
                         In Stock — {{ product.stock }} units available
                     </p>
                     {% else %}
                     <span class="w-3 h-3 bg-red-500 rounded-full"></span>
-                    <p class="text-sm font-extrabold text-red-600 uppercase tracking-wider">
+                    <p class="text-xs sm:text-sm font-extrabold text-red-600 uppercase tracking-wider">
                         Currently Out of Stock
                     </p>
                     {% endif %}
@@ -80,35 +81,32 @@
             </div>
 
             <!-- Structured Technical Description -->
-            <div class="space-y-2">
-                <h4 class="text-xs font-black uppercase tracking-widest text-slate-400">Design Description</h4>
-                <p class="text-sm text-slate-600 leading-relaxed font-semibold">
+            <div class="space-y-1 sm:space-y-2">
+                <h4 class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400">Design Description</h4>
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed font-semibold">
                     {{ product.description }}
                 </p>
             </div>
 
             <!-- Dynamic Session Cart Action Form -->
             {% if product.stock > 0 %}
-            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-6">
+            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl shadow-sm space-y-4 sm:space-y-6">
                 {% csrf_token %}
                 
                 <!-- Qty Selector (Fully Functional) -->
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-black uppercase tracking-widest text-slate-700">Quantity Required</span>
                     <div class="flex items-center border-2 border-slate-300 rounded-xl overflow-hidden bg-slate-50">
-                        <!-- Decrement Button -->
-                        <button type="button" onclick="decrementQty()" class="px-4 py-2.5 text-slate-800 hover:bg-slate-200 font-extrabold transition">−</button>
-                        <!-- Quantity Input -->
+                        <button type="button" onclick="decrementQty()" class="px-3.5 py-2 text-slate-800 hover:bg-slate-200 font-extrabold transition text-sm">−</button>
                         <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" 
-                               class="w-14 text-center text-sm font-black text-slate-900 bg-transparent focus:outline-none">
-                        <!-- Increment Button -->
-                        <button type="button" onclick="incrementQty()" class="px-4 py-2.5 text-slate-800 hover:bg-slate-200 font-extrabold transition">+</button>
+                               class="w-12 text-center text-xs sm:text-sm font-black text-slate-900 bg-transparent focus:outline-none">
+                        <button type="button" onclick="incrementQty()" class="px-3.5 py-2 text-slate-800 hover:bg-slate-200 font-extrabold transition text-sm">+</button>
                     </div>
                 </div>
 
                 <!-- ADD TO BAG CTA -->
                 <button type="submit" 
-                        class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-black text-xs uppercase tracking-widest py-4.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-black text-[10px] sm:text-xs uppercase tracking-widest py-3.5 sm:py-4.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
                     🛒 Add to Shopping Bag
                 </button>
             </form>
@@ -119,13 +117,13 @@
             {% endif %}
 
             <!-- Technical Trust Points -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200 text-xs text-slate-700">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-lg">🚚</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-slate-200 text-[10px] sm:text-xs text-slate-700">
+                <div class="flex items-center gap-2">
+                    <span class="text-base sm:text-lg">🚚</span>
                     <p class="font-bold">Nationwide Cash on Delivery <span class="font-medium text-slate-400">(2–4 days)</span></p>
                 </div>
-                <div class="flex items-center gap-2.5">
-                    <span class="text-lg">📸</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-base sm:text-lg">📸</span>
                     <p class="font-bold">100% Real Product Photography</p>
                 </div>
             </div>
@@ -136,11 +134,11 @@
 
 <!-- ===== SIGNATURE RELATED PRODUCTS ===== -->
 {% if related_products %}
-<section class="max-w-7xl mx-auto px-5 sm:px-8 py-16 border-t border-slate-200 mt-16">
-    <div class="flex items-end justify-between gap-4 pb-6 border-b border-slate-200 mb-10">
+<section class="max-w-7xl mx-auto px-4 sm:px-5 md:px-8 py-12 border-t border-slate-200 mt-12 sm:mt-16">
+    <div class="flex items-end justify-between gap-4 pb-4 sm:pb-6 border-b border-slate-200 mb-8">
         <div>
-            <span class="text-xs font-black uppercase tracking-widest text-emerald-800 block mb-1">Pairs Perfect with</span>
-            <h2 class="text-xl sm:text-3xl font-black tracking-tight text-slate-900 uppercase">Related Articles</h2>
+            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-emerald-800 block mb-1">Pairs Perfect with</span>
+            <h2 class="text-lg sm:text-3xl font-black tracking-tight text-slate-900 uppercase">Related Articles</h2>
         </div>
     </div>
 
