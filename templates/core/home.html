@@ -4,21 +4,19 @@
 
 {% block content %}
 
-<!-- ===== HERO SECTION WITH CLEAN DUAL PILLARS, GLOWING LAMPS & BOLD CRESCENT-STARS ===== -->
+<!-- ===== HERO SECTION WITH RESPONSIVE PILLARS ON ALL SCREENS ===== -->
 <section class="relative min-h-[80vh] md:min-h-[85vh] flex items-center justify-center px-4 sm:px-8 overflow-hidden bg-gradient-to-b from-white/70 to-slate-100/70 border-b border-slate-200">
     
-    <!-- 🕌 LEFT BACKGROUND ART: CLEAN PILLAR + GLOWING LAMP + BOLD CRESCENT & STAR -->
+    <!-- 🕌 LEFT BACKGROUND ART: PILLAR + GLOWING LAMP -->
     <div class="absolute left-0 bottom-0 top-0 w-[18%] sm:w-[22%] md:w-[24%] opacity-[0.35] md:opacity-[0.55] pointer-events-none select-none z-0">
         <svg class="w-full h-full" viewBox="0 0 250 800" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <!-- Main Lamp Glow Gradient -->
                 <radialGradient id="left-glow" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="#FFF7D6" stop-opacity="1"></stop>
                     <stop offset="25%" stop-color="#FFD54F" stop-opacity="0.95"></stop>
                     <stop offset="65%" stop-color="#B88E44" stop-opacity="0.5"></stop>
                     <stop offset="100%" stop-color="#B88E44" stop-opacity="0"></stop>
                 </radialGradient>
-                <!-- Dedicated Crescent & Star Glow Gradient -->
                 <radialGradient id="crescent-glow-left" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="#FFF7D6" stop-opacity="1"></stop>
                     <stop offset="35%" stop-color="#FFD54F" stop-opacity="0.9"></stop>
@@ -27,23 +25,13 @@
                 </radialGradient>
             </defs>
 
-            <!-- Pillars (Deep Dark Emerald Green) -->
             <path d="M40 800V280M60 800V280M50 800V280" stroke="#043E2E" stroke-width="3.5"></path>
-            
-            <!-- Pedestal/Base (Gold + Emerald) -->
             <path d="M30 800h40v-18H30z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
             <path d="M22 782h56v-12H22z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"></path>
-            
-            <!-- Column Capital (Gold + Emerald) -->
             <path d="M35 280h30l6-24H29l6 24z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
             <path d="M20 256h60v-10H20z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"></path>
-            
-            <!-- Clean Solid Mihrab Arch Sweeping to Top-Right -->
             <path d="M50 246C90 170 160 85 250 65" stroke="#B88E44" stroke-width="4" stroke-linecap="round"></path>
             
-            <!-- ========================================== -->
-            <!-- 🌟 GLOWING GOLD LAMP (FANOUS) SYSTEM -->
-            <!-- ========================================== -->
             <circle cx="120" cy="225" r="38" fill="url(#left-glow)"></circle>
             <line x1="120" y1="145" x2="120" y2="200" stroke="#B88E44" stroke-width="2.5"></line>
             <path d="M105 200h30l-5-12h-20l-5 12z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
@@ -52,35 +40,28 @@
             <path d="M112 250h16v6h-16z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
             <path d="M120 256l-3 10 3 5 3-5-3-10z" fill="#B88E44" stroke="#043E2E" stroke-width="1"></path>
             
-            <!-- ========================================== -->
-            <!-- 🌙 BOLD THICK GOLD CRESCENT & STAR SYSTEM -->
-            <!-- ========================================== -->
             <circle cx="180" cy="158" r="34" fill="url(#crescent-glow-left)"></circle>
             <line x1="175" y1="102" x2="175" y2="132" stroke="#B88E44" stroke-width="2.5"></line>
             <circle cx="175" cy="134" r="3" fill="#B88E44" stroke="#043E2E" stroke-width="1"></circle>
             <path d="M175,138 A20,20 0 1,0 175,178 A15,15 0 1,1 175,138" fill="#B88E44" stroke="#043E2E" stroke-width="2.5"></path>
             <polygon points="185,150 188,155 194,155 189,159 191,165 185,161 179,165 181,159 176,155 182,155" fill="#FFF7D6" stroke="#043E2E" stroke-width="1.8"></polygon>
-            <!-- ========================================== -->
 
-            <!-- Star & Diamond Motifs on Pillar -->
             <path d="M50 380l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"></path>
             <path d="M50 500l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"></path>
             <path d="M50 620l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"></path>
         </svg>
     </div>
 
-    <!-- 🕌 RIGHT BACKGROUND ART: CLEAN PILLAR + GLOWING LAMP + BOLD CRESCENT & STAR -->
+    <!-- 🕌 RIGHT BACKGROUND ART: PILLAR + GLOWING LAMP -->
     <div class="absolute right-0 bottom-0 top-0 w-[18%] sm:w-[22%] md:w-[24%] opacity-[0.35] md:opacity-[0.55] pointer-events-none select-none z-0">
         <svg class="w-full h-full" viewBox="0 0 250 800" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <!-- Main Lamp Glow Gradient -->
                 <radialGradient id="right-glow" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="#FFF7D6" stop-opacity="1"></stop>
                     <stop offset="25%" stop-color="#FFD54F" stop-opacity="0.95"></stop>
                     <stop offset="65%" stop-color="#B88E44" stop-opacity="0.5"></stop>
                     <stop offset="100%" stop-color="#B88E44" stop-opacity="0"></stop>
                 </radialGradient>
-                <!-- Dedicated Crescent & Star Glow Gradient -->
                 <radialGradient id="crescent-glow-right" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stop-color="#FFF7D6" stop-opacity="1"></stop>
                     <stop offset="35%" stop-color="#FFD54F" stop-opacity="0.9"></stop>
@@ -89,23 +70,13 @@
                 </radialGradient>
             </defs>
 
-            <!-- Pillars (Deep Dark Emerald Green) -->
             <path d="M210 800V280M190 800V280M200 800V280" stroke="#043E2E" stroke-width="3.5"></path>
-            
-            <!-- Pedestal/Base (Gold + Emerald) -->
             <path d="M180 800h40v-18h-40z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
             <path d="M172 782h56v-12h-56z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"></path>
-            
-            <!-- Column Capital (Gold + Emerald) -->
             <path d="M185 280h30l6-24h-42l6 24z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
             <path d="M170 256h60v-10h-60z" fill="#B88E44" stroke="#043E2E" stroke-width="1.5"></path>
-            
-            <!-- Clean Solid Mihrab Arch Sweeping to Top-Left -->
             <path d="M200 246C160 170 90 85 0 65" stroke="#B88E44" stroke-width="4" stroke-linecap="round"></path>
             
-            <!-- ========================================== -->
-            <!-- 🌟 GLOWING GOLD LAMP (FANOUS) SYSTEM -->
-            <!-- ========================================== -->
             <circle cx="130" cy="225" r="38" fill="url(#right-glow)"></circle>
             <line x1="130" y1="145" x2="130" y2="200" stroke="#B88E44" stroke-width="2.5"></line>
             <path d="M115 200h30l-5-12h-20l-5 12z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
@@ -114,17 +85,12 @@
             <path d="M122 250h16v6h-16z" fill="#043E2E" stroke="#B88E44" stroke-width="2"></path>
             <path d="M130 256l-3 10 3 5 3-5-3-10z" fill="#B88E44" stroke="#043E2E" stroke-width="1"></path>
             
-            <!-- ========================================== -->
-            <!-- 🌙 BOLD THICK GOLD CRESCENT & STAR SYSTEM -->
-            <!-- ========================================== -->
             <circle cx="70" cy="158" r="34" fill="url(#crescent-glow-right)"></circle>
             <line x1="75" y1="102" x2="75" y2="132" stroke="#B88E44" stroke-width="2.5"></line>
             <circle cx="75" cy="134" r="3" fill="#B88E44" stroke="#043E2E" stroke-width="1"></circle>
             <path d="M75,138 A20,20 0 1,1 75,178 A15,15 0 1,0 75,138" fill="#B88E44" stroke="#043E2E" stroke-width="2.5"></path>
             <polygon points="65,150 68,155 74,155 69,159 71,165 65,161 59,165 61,159 56,155 62,155" fill="#FFF7D6" stroke="#043E2E" stroke-width="1.8"></polygon>
-            <!-- ========================================== -->
 
-            <!-- Star & Diamond Motifs on Pillar -->
             <path d="M200 380l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"></path>
             <path d="M200 500l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"></path>
             <path d="M200 620l14 14 14-14-14-14-14 14z" fill="#B88E44" stroke="#043E2E" stroke-width="2"></path>
@@ -175,7 +141,8 @@
     </div>
 
     {% if featured_products %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
+    <!-- ===== 📱 2-COLUMN RESPONSIVE HOME GRID ===== -->
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 md:gap-8">
         {% for product in featured_products %}
         <div class="modern-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
             
@@ -188,29 +155,29 @@
                     {% endif %}
 
                     {% if product.discount_percentage > 0 %}
-                    <span class="absolute top-2 left-2 sm:top-3 sm:left-3 bg-red-600 text-white text-[10px] sm:text-[11px] font-black tracking-wider uppercase px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow">
-                        Save {{ product.discount_percentage }}% OFF
+                    <span class="absolute top-2 left-2 bg-red-600 text-white text-[8px] sm:text-[11px] font-black tracking-wider uppercase px-2 py-0.5 sm:px-3 sm:py-1 rounded-full shadow">
+                        Save {{ product.discount_percentage }}%
                     </span>
                     {% endif %}
 
-                    <span class="absolute top-2 right-2 sm:top-3 sm:right-3 bg-slate-900/80 backdrop-blur-sm text-white text-[9px] sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md">
+                    <span class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur-sm text-white text-[8px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-md">
                         {% if product.stock > 0 %}In Stock{% else %}Sold Out{% endif %}
                     </span>
                 </div>
 
-                <div class="p-4 sm:p-5 space-y-2 sm:space-y-3">
-                    <span class="text-[9px] sm:text-[10px] font-extrabold tracking-widest text-emerald-800 uppercase block">
+                <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-3">
+                    <span class="text-[8px] sm:text-[10px] font-extrabold tracking-widest text-emerald-800 uppercase block">
                         {{ product.category.name }}
                     </span>
-                    <h3 class="text-lg sm:text-xl font-black tracking-tight text-slate-900 uppercase group-hover:text-emerald-800 transition">
+                    <h3 class="text-sm sm:text-xl font-black tracking-tight text-slate-900 uppercase group-hover:text-emerald-800 transition line-clamp-1">
                         {{ product.name }}
                     </h3>
-                    <div class="flex items-baseline gap-2 sm:gap-3 pt-1">
-                        <span class="text-xl sm:text-2xl font-black text-red-600 tracking-tight">
+                    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-3 pt-1">
+                        <span class="text-base sm:text-2xl font-black text-red-600 tracking-tight">
                             Rs. {{ product.price|floatformat:0 }}
                         </span>
                         {% if product.original_price %}
-                        <span class="text-xs sm:text-sm font-bold text-slate-400 line-through">
+                        <span class="text-[10px] sm:text-sm font-bold text-slate-400 line-through">
                             Rs. {{ product.original_price|floatformat:0 }}
                         </span>
                         {% endif %}
@@ -218,10 +185,10 @@
                 </div>
             </a>
 
-            <div class="p-4 sm:p-5 pt-0">
+            <div class="p-3 sm:p-5 pt-0">
                 <a href="/products/{{ product.slug }}/" 
-                   class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-extrabold text-[10px] sm:text-xs uppercase tracking-widest py-3 sm:py-3.5 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-sm">
-                    <span>View Article Details</span>
+                   class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-extrabold text-[9px] sm:text-xs uppercase tracking-widest py-2.5 sm:py-3.5 rounded-xl flex items-center justify-center gap-1 sm:gap-2 transition-colors shadow-sm">
+                    <span>Details</span>
                     <span>→</span>
                 </a>
             </div>

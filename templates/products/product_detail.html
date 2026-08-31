@@ -92,20 +92,23 @@
             <form method="post" action="{% url 'cart:cart_add' product.id %}" class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm space-y-6">
                 {% csrf_token %}
                 
-                <!-- Qty Selector -->
+                <!-- Qty Selector (Fully Functional) -->
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-black uppercase tracking-widest text-slate-700">Quantity Required</span>
                     <div class="flex items-center border-2 border-slate-300 rounded-xl overflow-hidden bg-slate-50">
+                        <!-- Decrement Button -->
                         <button type="button" onclick="decrementQty()" class="px-4 py-2.5 text-slate-800 hover:bg-slate-200 font-extrabold transition">−</button>
+                        <!-- Quantity Input -->
                         <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" 
                                class="w-14 text-center text-sm font-black text-slate-900 bg-transparent focus:outline-none">
+                        <!-- Increment Button -->
                         <button type="button" onclick="incrementQty()" class="px-4 py-2.5 text-slate-800 hover:bg-slate-200 font-extrabold transition">+</button>
                     </div>
                 </div>
 
-                <!-- ADD TO BAG CTA (VIBRANT) -->
+                <!-- ADD TO BAG CTA -->
                 <button type="submit" 
-                        class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-black text-xs uppercase tracking-widest py-4.5 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-black text-xs uppercase tracking-widest py-4.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
                     🛒 Add to Shopping Bag
                 </button>
             </form>
@@ -141,7 +144,8 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <!-- 📱 2-COLUMN RESPONSIVE RELATED GRID -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 md:gap-8">
         {% for related in related_products %}
         <div class="modern-card bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
             <a href="/products/{{ related.slug }}/" class="block">
@@ -152,17 +156,17 @@
                         <div class="w-full h-full flex items-center justify-center text-slate-700 text-3xl">☪</div>
                     {% endif %}
                 </div>
-                <div class="p-4 space-y-2">
-                    <span class="text-[9px] font-extrabold tracking-widest text-emerald-800 uppercase block">
+                <div class="p-3 sm:p-4 space-y-1.5 sm:space-y-2">
+                    <span class="text-[8px] sm:text-[9px] font-extrabold tracking-widest text-emerald-800 uppercase block">
                         {{ related.category.name }}
                     </span>
-                    <h3 class="text-lg font-black text-slate-900 uppercase group-hover:text-emerald-800 transition">
+                    <h3 class="text-sm sm:text-lg font-black text-slate-900 uppercase group-hover:text-emerald-800 transition line-clamp-1">
                         {{ related.name }}
                     </h3>
-                    <div class="flex items-baseline gap-2 pt-1">
-                        <span class="text-xl font-black text-red-600">Rs. {{ related.price|floatformat:0 }}</span>
+                    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 pt-1">
+                        <span class="text-base sm:text-xl font-black text-red-600">Rs. {{ related.price|floatformat:0 }}</span>
                         {% if related.original_price %}
-                        <span class="text-xs font-bold text-slate-400 line-through">Rs. {{ related.original_price|floatformat:0 }}</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400 line-through">Rs. {{ related.original_price|floatformat:0 }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -173,23 +177,28 @@
 </section>
 {% endif %}
 
-{% endblock %}
-
-{% block extra_js %}
+<!-- ===== 🛠️ INLINE FUNCTIONAL JAVASCRIPT ===== -->
 <script>
     function incrementQty() {
         const input = document.getElementById('quantity');
-        const max = parseInt(input.getAttribute('max'));
-        if (parseInt(input.value) < max) {
-            input.value = parseInt(input.value) + 1;
+        if (input) {
+            const max = parseInt(input.getAttribute('max')) || 99;
+            const currentVal = parseInt(input.value) || 1;
+            if (currentVal < max) {
+                input.value = currentVal + 1;
+            }
         }
     }
 
     function decrementQty() {
         const input = document.getElementById('quantity');
-        if (parseInt(input.value) > 1) {
-            input.value = parseInt(input.value) - 1;
+        if (input) {
+            const currentVal = parseInt(input.value) || 1;
+            if (currentVal > 1) {
+                input.value = currentVal - 1;
+            }
         }
     }
 </script>
+
 {% endblock %}
