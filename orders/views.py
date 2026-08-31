@@ -1,32 +1,53 @@
+import os
+import json
+import urllib.request
 import threading
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
 from django.db import transaction
 from cart.cart import Cart
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
 
 
-def _send_email_async(subject, message, from_email, recipient_list):
-    """Worker function that runs silently in background thread."""
+def _send_email_via_resend_api(subject, message_text, recipient_email):
+    """
+    Sends email via Resend HTTPS REST API (Port 443).
+    Bypasses all cloud SMTP port blocking on Render for 100% delivery!
+    """
+    api_key = os.getenv('RESEND_API_KEY', '').strip()
+    if not api_key:
+        print("⚠️ RESEND_API_KEY is missing. Email skipped.")
+        return
+
+    url = "https://api.resend.com/emails"
+    payload = {
+        "from": "Shah G Cap House <onboarding@resend.dev>",
+        "to": [recipient_email],
+        "subject": subject,
+        "text": message_text
+    }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode('utf-8'),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "ShahGCapHouse/1.0"
+        }
+    )
+
     try:
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=from_email,
-            recipient_list=recipient_list,
-            fail_silently=True,
-        )
+        with urllib.request.urlopen(req, timeout=8) as response:
+            print(f"✅ Email successfully delivered to {recipient_email} via Resend API (HTTP {response.status})")
     except Exception as e:
-        print(f"⚠️ Background email error: {e}")
+        print(f"⚠️ Resend API delivery error: {e}")
 
 
 def send_order_notification_email(order):
     """
-    Spawns a fast background thread to send the email notification.
-    Checkout completes in 0.1 second without any waiting or loading!
+    Spawns a fast background thread to deliver the order alert to Mashood.
     """
     try:
         items_list = ""
@@ -63,10 +84,10 @@ Timestamp: {order.created_at.strftime('%d %B %Y, %I:%M %p')}
 Please contact the customer on WhatsApp ({order.phone}) to confirm dispatch.
         """
 
-        # ⚡ Run in background thread so customer gets instant response
+        # ⚡ Background Thread (Zero customer wait time)
         email_thread = threading.Thread(
-            target=_send_email_async,
-            args=(subject, message, settings.DEFAULT_FROM_EMAIL, ['mashoodarshad22@gmail.com']),
+            target=_send_email_via_resend_api,
+            args=(subject, message, 'mashoodarshad22@gmail.com'),
             daemon=True
         )
         email_thread.start()
@@ -78,8 +99,6 @@ Please contact the customer on WhatsApp ({order.phone}) to confirm dispatch.
 def checkout(request):
     """
     Handles checkout form display and secure Cash on Delivery order creation.
-    Uses Django Form validation and atomic DB transactions.
-    Prices are fetched from DATABASE, not from session (security).
     """
     cart = Cart(request)
 
@@ -95,14 +114,11 @@ def checkout(request):
         form = OrderCreateForm(request.POST)
 
         if form.is_valid():
-            # 🔒 ATOMIC TRANSACTION: All-or-nothing order creation
             try:
                 with transaction.atomic():
-                    # Ensure session key exists for guest tracking
                     if not request.session.session_key:
                         request.session.save()
 
-                    # 1. Create Order record
                     order = Order(
                         first_name=form.cleaned_data['first_name'],
                         phone=form.cleaned_data['phone'],
@@ -115,7 +131,6 @@ def checkout(request):
                     )
                     order.save()
 
-                    # 2. Fetch REAL prices from DATABASE
                     order_total = 0
                     for item in cart:
                         db_product = item['product']
@@ -128,23 +143,20 @@ def checkout(request):
                             quantity=item['quantity']
                         )
 
-                        # Reduce stock safely
                         db_product.stock = max(0, db_product.stock - item['quantity'])
                         db_product.save()
 
                         order_total += real_price * item['quantity']
 
-                    # 3. Update order total with real DB-calculated amount
                     order.total_cost = order_total + shipping_cost
                     order.save()
 
-                # 4. Clear cart
+                # Clear session cart
                 cart.clear()
 
-                # 5. Send instant email notification in background
+                # Send fast HTTPS email notification
                 send_order_notification_email(order)
 
-                # 6. Redirect to success page
                 return redirect('orders:order_success', order_id=order.id)
 
             except Exception as e:
