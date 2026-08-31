@@ -11,7 +11,7 @@ def cart_detail(request):
     """
     cart = Cart(request)
     subtotal = cart.get_subtotal_price()
-    
+
     # Flat delivery fee across Pakistan (Free shipping over Rs. 5,000)
     if subtotal > 0:
         shipping_fee = 0 if subtotal >= 5000 else 150
@@ -36,17 +36,35 @@ def cart_add(request, product_id):
     """
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id, is_active=True)
-    
+
     try:
         quantity = int(request.POST.get('quantity', 1))
     except (ValueError, TypeError):
         quantity = 1
-        
+
     if quantity < 1:
         quantity = 1
 
     cart.add(product=product, quantity=quantity)
     messages.success(request, f'"{product.name}" has been added to your shopping bag.')
+    return redirect('cart:cart_detail')
+
+
+@require_POST
+def cart_update(request, product_id):
+    """
+    Updates the quantity of a specific product in the cart.
+    Called from the cart detail page via +/- buttons.
+    """
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id, is_active=True)
+
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+    except (ValueError, TypeError):
+        quantity = 1
+
+    cart.update_quantity(product=product, quantity=quantity)
     return redirect('cart:cart_detail')
 
 

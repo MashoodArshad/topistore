@@ -12,7 +12,6 @@ class Cart:
         self.session = request.session
         cart = self.session.get('cart')
         if not cart:
-            # Initialize empty cart in session
             cart = self.session['cart'] = {}
         self.cart = cart
 
@@ -26,26 +25,42 @@ class Cart:
                 'quantity': 0,
                 'price': str(product.price)
             }
-        
+
         if override_quantity:
             self.cart[product_id]['quantity'] = quantity
         else:
             self.cart[product_id]['quantity'] += quantity
-            
+
         # Ensure quantity does not exceed available product stock
         if self.cart[product_id]['quantity'] > product.stock:
             self.cart[product_id]['quantity'] = product.stock
 
+        # Ensure minimum quantity is 1
+        if self.cart[product_id]['quantity'] < 1:
+            self.cart[product_id]['quantity'] = 1
+
         self.save()
 
+    def update_quantity(self, product, quantity):
+        """
+        Update the quantity of a specific product in the cart.
+        Validates against available stock and minimum of 1.
+        """
+        product_id = str(product.id)
+        if product_id in self.cart:
+            # Clamp quantity between 1 and available stock
+            quantity = max(1, min(quantity, product.stock))
+            self.cart[product_id]['quantity'] = quantity
+            # Update price to current product price
+            self.cart[product_id]['price'] = str(product.price)
+            self.save()
+
     def save(self):
-        # Mark session as modified to ensure it gets saved in database
+        """Mark session as modified to ensure it gets saved."""
         self.session.modified = True
 
     def remove(self, product):
-        """
-        Remove a product from the cart completely.
-        """
+        """Remove a product from the cart completely."""
         product_id = str(product.id)
         if product_id in self.cart:
             del self.cart[product_id]
@@ -53,14 +68,22 @@ class Cart:
 
     def __iter__(self):
         """
-        Iterate over the items in the cart and get the products from the database.
+        Iterate over cart items, fetch fresh product data from DB,
+        and re-validate stock and active status.
         """
         product_ids = self.cart.keys()
-        products = Product.objects.filter(id__in=product_ids)
+        # Only fetch active products (handles deactivated items)
+        products = Product.objects.filter(id__in=product_ids, is_active=True)
         cart = self.cart.copy()
 
         for product in products:
-            cart[str(product.id)]['product'] = product
+            pid = str(product.id)
+            cart[pid]['product'] = product
+            # Re-sync price with current DB price
+            cart[pid]['price'] = str(product.price)
+            # Re-validate stock (if stock decreased after adding)
+            if cart[pid]['quantity'] > product.stock:
+                cart[pid]['quantity'] = product.stock
 
         for item in cart.values():
             if 'product' in item:
@@ -69,20 +92,18 @@ class Cart:
                 yield item
 
     def __len__(self):
-        """
-        Count all items in the cart (sum of quantities).
-        """
+        """Count all items in the cart (sum of quantities)."""
         return sum(item['quantity'] for item in self.cart.values())
 
     def get_subtotal_price(self):
-        """
-        Calculate total price of all items in cart.
-        """
-        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+        """Calculate total price of all items in cart."""
+        return sum(
+            Decimal(item['price']) * item['quantity']
+            for item in self.cart.values()
+        )
 
     def clear(self):
-        """
-        Remove cart from session (used after checkout).
-        """
-        del self.session['cart']
-        self.save()
+        """Remove cart from session (used after checkout)."""
+        if 'cart' in self.session:
+            del self.session['cart']
+            self.save()
