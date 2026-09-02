@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .models import Profile  # 👈 Yeh import missing tha, ab add ho gaya!
 
 class SignUpForm(UserCreationForm):
     full_name = forms.CharField(
@@ -36,7 +37,6 @@ class SignUpForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Custom input classes for default fields (username, password etc)
         for field_name in self.fields:
             if field_name not in ['full_name', 'email', 'phone']:
                 self.fields[field_name].widget.attrs.update({
@@ -53,7 +53,7 @@ class SignUpForm(UserCreationForm):
         
         if commit:
             user.save()
-            # Profile default generate ho jata hai signal se, so hum save/update karenge
+            # Ab Python ko pata hai ke Profile kya hai!
             profile, created = Profile.objects.get_or_create(user=user)
             profile.phone = self.cleaned_data['phone']
             profile.save()
