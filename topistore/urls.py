@@ -20,6 +20,11 @@ urlpatterns = [
     re_path(r'^media/(?P<path>.*)$', cached_serve, {'document_root': settings.MEDIA_ROOT}),
     re_path(r'^static/(?P<path>.*)$', cached_serve, {'document_root': settings.STATIC_ROOT}),
 ]
+from core import views as core_views
+
+# Custom Error Handlers
+handler404 = 'core.views.custom_404'
+handler500 = 'core.views.custom_500'
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

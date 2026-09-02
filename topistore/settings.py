@@ -25,6 +25,37 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'default-unsafe-dev-key-do-not-use-in-prod'
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',') if host.strip()]
+# ==========================================
+# 🔒 SECURITY HARDENING (Production Only)
+# ==========================================
+# Ye settings sirf tab active hongi jab DEBUG=False (Production/Render)
+# Local development (DEBUG=True) par ye automatically skip ho jayengi
+
+if not DEBUG:
+    # HTTPS Enforcement
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # HSTS (HTTP Strict Transport Security)
+    SECURE_HSTS_SECONDS = 31536000  # 1 Year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Cookie Security
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # XSS & Clickjacking Protection
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+
+# Render ke domain ko CSRF trusted origins mein add karna zaroori hai
+# Warna checkout form submit karne par "CSRF verification failed" error aayega
+CSRF_TRUSTED_ORIGINS = [
+    'https://shah-g-cap-house.onrender.com',
+    'https://*.onrender.com',
+]
 
 
 # Application definition
