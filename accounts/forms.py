@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Profile  # 👈 Yeh import missing tha, ab add ho gaya!
+from django.contrib.auth.forms import UserCreationForm
+from .models import Profile
 
 class SignUpForm(UserCreationForm):
     full_name = forms.CharField(
@@ -43,17 +43,26 @@ class SignUpForm(UserCreationForm):
                     'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-emerald focus:border-transparent text-sm transition'
                 })
 
+    # 🔒 INTERNATIONAL STANDARD CHECK: Enforce Unique Email
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        
+        # Check if any user already has this email (case-insensitive)
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("An account with this email address already exists. Please log in or use a different email.")
+        
+        return email
+
     def save(self, commit=True):
         user = super().save(commit=False)
         names = self.cleaned_data['full_name'].split(' ', 1)
         user.first_name = names[0]
         if len(names) > 1:
             user.last_name = names[1]
-        user.email = self.cleaned_data['email']
+        user.email = self.cleaned_data['email'].strip().lower()
         
         if commit:
             user.save()
-            # Ab Python ko pata hai ke Profile kya hai!
             profile, created = Profile.objects.get_or_create(user=user)
             profile.phone = self.cleaned_data['phone']
             profile.save()
