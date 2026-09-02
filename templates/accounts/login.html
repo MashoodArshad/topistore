@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Login — Shah G Cap House{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-5 py-12">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-8 sm:p-10 relative">
+        
+        <!-- Luxury Top Emerald Strip -->
+        <div class="absolute top-0 left-0 w-full h-2 bg-brand-emerald"></div>
+
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-black uppercase text-brand-dark tracking-tight">WELCOME BACK</h2>
+            <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Sign in to your Shah G Account</p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="space-y-1.5">
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-700 block">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <span class="text-xs font-bold text-red-600 block mt-1">{{ field.errors.0 }}</span>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="w-full bg-brand-emerald hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-widest py-4 px-6 rounded-xl shadow-lg transition duration-300 transform active:scale-95 block text-center">
+                SIGN IN NOW
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-500 font-medium">
+            Don't have an account? 
+            <a href="{% url 'accounts:register' %}" class="text-brand-emerald font-extrabold uppercase hover:underline ml-1">Register Here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
