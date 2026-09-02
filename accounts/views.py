@@ -53,3 +53,16 @@ def logout_view(request):
     logout(request)
     messages.info(request, "You have been logged out securely.")
     return redirect('core:home')
+from django.contrib.auth.decorators import login_required
+from orders.models import Order  # Import Order model taake orders history profile page par dikha sakein
+
+@login_required
+def profile_view(request):
+    """
+    Displays User personal info and their past orders list.
+    """
+    user_orders = Order.objects.filter(user=request.user)
+    context = {
+        'orders': user_orders,
+    }
+    return render(request, 'accounts/profile.html', context)

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}My Profile — Shah G Cap House{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-5 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Profile info panel -->
+        <div class="lg:col-span-1 bg-white rounded-3xl border border-slate-200 shadow-xl p-8 relative h-fit overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-brand-emerald"></div>
+            
+            <div class="flex flex-col items-center text-center">
+                <div class="w-20 h-20 bg-brand-emerald/10 text-brand-emerald rounded-full flex items-center justify-center font-black text-2xl mb-4">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+                <h3 class="text-xl font-extrabold text-brand-dark uppercase tracking-tight">
+                    {{ user.first_name }} {{ user.last_name }}
+                </h3>
+                <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">Valued Customer</p>
+            </div>
+
+            <div class="mt-8 space-y-4 text-sm border-t border-slate-100 pt-6">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Username</span>
+                    <span class="font-semibold text-brand-dark mt-0.5 block">{{ user.username }}</span>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Email Address</span>
+                    <span class="font-semibold text-brand-dark mt-0.5 block">{{ user.email|default:"Not Provided" }}</span>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Phone Number</span>
+                    <span class="font-semibold text-brand-emerald mt-0.5 block">
+                        {{ user.profile.phone|default:"Not Provided" }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders History inside Profile Panel -->
+        <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-xl p-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-brand-dark"></div>
+            
+            <h2 class="text-lg font-black uppercase text-brand-dark tracking-tight mb-6">MY ORDER HISTORY</h2>
+
+            {% if orders %}
+            <div class="space-y-4">
+                {% for order in orders %}
+                <div class="border border-slate-100 bg-slate-50/50 hover:bg-slate-50 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition duration-200">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-brand-dark uppercase">{{ order.order_number }}</span>
+                            <span class="text-[10px] px-2.5 py-1 font-bold rounded-full uppercase tracking-wider
+                                {% if order.status == 'Delivered' %}bg-green-100 text-green-800
+                                {% elif order.status == 'Pending' %}bg-amber-100 text-amber-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 font-semibold uppercase mt-1">Placed on: {{ order.created_at|date:"d M Y" }}</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-5 w-full sm:w-auto justify-between sm:justify-end">
+                        <div class="text-left sm:text-right">
+                            <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Grand Total</span>
+                            <span class="text-sm font-black text-brand-emerald block">Rs. {{ order.total_cost|floatformat:0 }}</span>
+                        </div>
+                        <a href="{% url 'orders:order_detail' order.order_number %}" class="bg-brand-dark hover:bg-slate-800 text-white font-extrabold text-[10px] tracking-wider uppercase py-3 px-5 rounded-xl transition">
+                            View Invoice
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 border border-dashed border-slate-200 rounded-3xl">
+                <p class="text-sm text-slate-500 font-medium">You haven't placed any orders yet.</p>
+                <a href="{% url 'products:product_list' %}" class="inline-block mt-4 text-xs font-black uppercase tracking-wider bg-brand-emerald text-white py-3 px-6 rounded-xl hover:bg-emerald-800 transition">
+                    Start Shopping
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

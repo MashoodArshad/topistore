@@ -5,6 +5,7 @@ import threading
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
+from django.contrib.auth.decorators import login_required  # 👈 1. Import Login Required Guard
 from cart.cart import Cart
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
@@ -96,9 +97,11 @@ Please contact the customer on WhatsApp ({order.phone}) to confirm dispatch.
         print(f"⚠️ Email preparation failed: {e}")
 
 
+@login_required  # 👈 2. Guard Lagaya (Bina login ke is view mein koi nahi aa sakta)
 def checkout(request):
     """
     Handles checkout form display and secure Cash on Delivery order creation.
+    Requires user authentication, pre-fills billing details from profile.
     """
     cart = Cart(request)
 
@@ -116,10 +119,9 @@ def checkout(request):
         if form.is_valid():
             try:
                 with transaction.atomic():
-                    if not request.session.session_key:
-                        request.session.save()
-
+                    # Order save karte waqt authenticated user details lock karein
                     order = Order(
+                        user=request.user,  # 👈 3. Order ke user field ko lock kiya
                         first_name=form.cleaned_data['first_name'],
                         phone=form.cleaned_data['phone'],
                         address=form.cleaned_data['address'],
@@ -127,7 +129,6 @@ def checkout(request):
                         shipping_cost=shipping_cost,
                         total_cost=0,
                         status='Pending',
-                        session_key=request.session.session_key,
                     )
                     order.save()
 
@@ -172,7 +173,17 @@ def checkout(request):
         else:
             messages.error(request, "Please correct the errors in the form below.")
     else:
-        form = OrderCreateForm()
+        # 👈 4. FORM PRE-FILL: Database se authenticated user ka data uthaya
+        user_fullname = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
+        user_phone = ""
+        if hasattr(request.user, 'profile'):
+            user_phone = request.user.profile.phone or ""
+
+        # Pre-fill initial form fields
+        form = OrderCreateForm(initial={
+            'first_name': user_fullname,
+            'phone': user_phone
+        })
 
     context = {
         'form': form,
@@ -184,31 +195,30 @@ def checkout(request):
     return render(request, 'orders/checkout.html', context)
 
 
+@login_required  # Guard lagaya taake sirf orders place karne wala hi success page dekhe
 def order_success(request, order_id):
     """
     Renders order confirmation screen with 1-Click WhatsApp Connect button.
     """
-    order = get_object_or_404(Order, id=order_id)
+    order = get_object_or_404(Order, id=order_id, user=request.user) # 👈 5. Secure check (Koi aur na dekh sake)
     return render(request, 'orders/order_success.html', {'order': order})
 
 
+@login_required  # Guard lagaya
 def order_history(request):
     """
-    Shows order history for the current session (guest users).
+    Shows order history for the current logged-in user.
     """
-    session_key = request.session.session_key
-    if not session_key:
-        orders = Order.objects.none()
-    else:
-        orders = Order.objects.filter(session_key=session_key)
-
+    # 👈 6. Purana session system khatam, authenticated user ke direct orders get kiye
+    orders = Order.objects.filter(user=request.user)
     return render(request, 'orders/order_history.html', {'orders': orders})
 
 
+@login_required  # Guard lagaya
 def order_detail(request, order_number):
     """
     Shows detailed view of a specific order for the customer.
     """
-    session_key = request.session.session_key
-    order = get_object_or_404(Order, order_number=order_number, session_key=session_key)
+    # 👈 7. Security check: Sirf logged-in user apna order hi dekh sake
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
     return render(request, 'orders/order_detail.html', {'order': order})

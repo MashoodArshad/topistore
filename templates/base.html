@@ -140,13 +140,14 @@
                     <div class="hidden lg:block urdu-signature font-bold select-none">
                         شاہ جی کیپ ہاؤس
                     </div>
-                    <!-- Auth Actions -->
+                                        <!-- Auth Actions -->
                     <div class="hidden md:flex items-center gap-4">
                         {% if user.is_authenticated %}
-                            <div class="text-right">
+                            <!-- Updated to lead to profile page -->
+                            <a href="{% url 'accounts:profile' %}" class="text-right group block">
                                 <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider leading-none">Walaikum Assalam</span>
-                                <span class="text-xs font-extrabold text-brand-emerald block mt-1 leading-none">{{ user.first_name|default:user.username }}</span>
-                            </div>
+                                <span class="text-xs font-extrabold text-brand-emerald block mt-1 leading-none group-hover:underline">{{ user.first_name|default:user.username }} 👤</span>
+                            </a>
                             <a href="{% url 'accounts:logout' %}" class="text-[10px] font-black uppercase tracking-wider text-brand-red border border-brand-red/20 hover:bg-brand-red hover:text-white px-3 py-1.5 rounded-lg transition">Logout</a>
                         {% else %}
                             <a href="{% url 'accounts:login' %}" class="text-xs font-extrabold uppercase tracking-wider text-slate-700 hover:text-brand-emerald transition">Login</a>
@@ -182,9 +183,9 @@
             <a href="{% url 'core:about' %}" class="block text-sm font-extrabold uppercase tracking-wider text-slate-800 py-1">About Us</a>
             <a href="{% url 'core:contact' %}" class="block text-sm font-extrabold uppercase tracking-wider text-slate-800 py-1">Contact</a>
             
-            <div class="border-t border-slate-100 pt-3 mt-2 space-y-2">
+                       <div class="border-t border-slate-100 pt-3 mt-2 space-y-2">
                 {% if user.is_authenticated %}
-                    <p class="text-xs font-bold text-brand-emerald">Salam, {{ user.first_name|default:user.username }}!</p>
+                    <a href="{% url 'accounts:profile' %}" class="block text-xs font-extrabold text-brand-emerald hover:underline py-1">Salam, {{ user.first_name|default:user.username }}! 👤 (View Profile)</a>
                     <a href="{% url 'accounts:logout' %}" class="block text-center text-xs font-black uppercase tracking-wider text-white bg-brand-red py-3 rounded-xl">Logout</a>
                 {% else %}
                     <a href="{% url 'accounts:login' %}" class="block text-center text-xs font-extrabold uppercase tracking-wider text-slate-700 bg-slate-100 py-3 rounded-xl">Login</a>

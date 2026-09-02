@@ -5,13 +5,27 @@
 <div class="max-w-lg mx-auto px-5 py-12">
     <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden p-8 sm:p-10 relative">
         
-        <!-- Luxury Top Gold/Emerald Strip -->
+        <!-- Luxury Top Emerald Strip -->
         <div class="absolute top-0 left-0 w-full h-2 bg-brand-emerald"></div>
 
         <div class="text-center mb-8">
             <h2 class="text-2xl font-black uppercase text-brand-dark tracking-tight">CREATE ACCOUNT</h2>
             <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Join us for a Premium Experience</p>
         </div>
+
+        <!-- ⚠️ GLOBAL ERRORS DISPLAY (For Password strength or general form errors) -->
+        {% if form.errors %}
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 text-xs font-semibold space-y-1">
+            <p class="font-bold uppercase tracking-wider text-red-800">Please correct the following errors:</p>
+            <ul class="list-disc list-inside">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field|capfirst }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
 
         <form method="post" class="space-y-5">
             {% csrf_token %}
@@ -25,9 +39,6 @@
                 {{ field }}
                 {% if field.help_text %}
                 <span class="text-[10px] text-slate-400 block leading-relaxed">{{ field.help_text|safe }}</span>
-                {% endif %}
-                {% if field.errors %}
-                <span class="text-xs font-bold text-red-600 block mt-1">{{ field.errors.0 }}</span>
                 {% endif %}
             </div>
             {% endfor %}

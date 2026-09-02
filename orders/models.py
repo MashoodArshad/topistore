@@ -1,12 +1,10 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User  # 👈 1. Django ka User Model import kiya
 from products.models import Product
 
 
 class Order(models.Model):
-    """
-    Model storing customer delivery details and order metadata.
-    """
     STATUS_CHOICES = [
         ('Pending', 'Pending (Unconfirmed)'),
         ('Confirmed', 'Confirmed / Processing'),
@@ -15,12 +13,22 @@ class Order(models.Model):
         ('Canceled', 'Canceled'),
     ]
 
-    # Unique human-readable order number (e.g. SGC-2025-A3F8)
+    # Unique human-readable order number
     order_number = models.CharField(
         max_length=50,
         blank=True,
         null=True,
         verbose_name="Order Reference"
+    )
+
+    # 👈 2. Order ko User account ke sath link kar diya (1 User has many Orders)
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='orders',
+        verbose_name="Customer Account"
     )
 
     first_name = models.CharField(max_length=150, verbose_name="Full Name")
@@ -34,7 +42,7 @@ class Order(models.Model):
 
     # Internal order tracking
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-    session_key = models.CharField(max_length=40, blank=True, null=True, help_text="For guest order history")
+    session_key = models.CharField(max_length=40, blank=True, null=True, help_text="For guest order history fallback")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -56,10 +64,6 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    """
-    Junction table storing specific products bought inside an order.
-    Price is fetched from DB at time of purchase (NOT from session).
-    """
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_items')
     price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price at time of purchase (from DB)")
