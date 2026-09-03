@@ -5,20 +5,17 @@ import threading
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db import transaction
-from django.contrib.auth.decorators import login_required  # 👈 1. Import Login Required Guard
+from django.contrib.auth.decorators import login_required
 from cart.cart import Cart
+from payments.gateway import SafepayGatewayClient
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
 
 
 def _send_email_via_resend_api(subject, message_text, recipient_email):
-    """
-    Sends email via Resend HTTPS REST API (Port 443).
-    Bypasses all cloud SMTP port blocking on Render for 100% delivery!
-    """
+    """Sends fast transactional email via Resend API."""
     api_key = os.getenv('RESEND_API_KEY', '').strip()
     if not api_key:
-        print("⚠️ RESEND_API_KEY is missing. Email skipped.")
         return
 
     url = "https://api.resend.com/emails"
@@ -41,26 +38,24 @@ def _send_email_via_resend_api(subject, message_text, recipient_email):
 
     try:
         with urllib.request.urlopen(req, timeout=8) as response:
-            print(f"✅ Email successfully delivered to {recipient_email} via Resend API (HTTP {response.status})")
+            print(f"✅ Email delivered to {recipient_email}")
     except Exception as e:
-        print(f"⚠️ Resend API delivery error: {e}")
+        print(f"⚠️ Email dispatch error: {e}")
 
 
 def send_order_notification_email(order):
-    """
-    Spawns a fast background thread to deliver the order alert to Mashood.
-    """
+    """Fires background thread to notify store owner of verified paid order."""
     try:
         items_list = ""
         for item in order.items.all():
             items_list += f"- {item.quantity}x {item.product.name} (Rs. {item.get_cost():,.0f})\n"
 
         ref = order.order_number or f"Order #{order.id}"
-        subject = f"🚨 New Order {ref} — Shah G Cap House"
+        subject = f"🚨 VERIFIED PAID ORDER {ref} — Shah G Cap House"
         message = f"""
 Assalamu Alaikum Mashood,
 
-You have received a new order on Shah G Cap House!
+You have received a new VERIFIED PAID order on Shah G Cap House!
 
 ========================================
 ORDER DETAILS ({ref})
@@ -75,17 +70,17 @@ ORDERED ITEMS
 ========================================
 {items_list}
 Shipping Fee: Rs. {order.shipping_cost:,.0f}
-Grand Total Payable: Rs. {order.total_cost:,.0f}
-Payment Method: Cash on Delivery (COD)
+Grand Total Paid: Rs. {order.total_cost:,.0f}
+Payment Method: Safepay (Cards / JazzCash / Easypaisa)
+Payment Status: {order.payment_status}
+Gateway Reference: {order.payment_id or order.tracker_token}
 
 ========================================
-STATUS: {order.status}
-Timestamp: {order.created_at.strftime('%d %B %Y, %I:%M %p')}
+TIMESTAMP: {order.created_at.strftime('%d %B %Y, %I:%M %p')}
 
-Please contact the customer on WhatsApp ({order.phone}) to confirm dispatch.
+This order has been verified. Dispatch parcel to customer.
         """
 
-        # ⚡ Background Thread (Zero customer wait time)
         email_thread = threading.Thread(
             target=_send_email_via_resend_api,
             args=(subject, message, 'mashoodarshad22@gmail.com'),
@@ -94,14 +89,14 @@ Please contact the customer on WhatsApp ({order.phone}) to confirm dispatch.
         email_thread.start()
 
     except Exception as e:
-        print(f"⚠️ Email preparation failed: {e}")
+        print(f"⚠️ Email notification preparation error: {e}")
 
 
-@login_required  # 👈 2. Guard Lagaya (Bina login ke is view mein koi nahi aa sakta)
+@login_required
 def checkout(request):
     """
-    Handles checkout form display and secure Cash on Delivery order creation.
-    Requires user authentication, pre-fills billing details from profile.
+    Handles checkout form validation, creates UNPAID Order,
+    initializes Safepay payment session, and redirects to Safepay Hosted Portal.
     """
     cart = Cart(request)
 
@@ -118,68 +113,68 @@ def checkout(request):
 
         if form.is_valid():
             try:
+                # 1. Create UNPAID Order in Database
                 with transaction.atomic():
-                    # Order save karte waqt authenticated user details lock karein
-                    order = Order(
-                        user=request.user,  # 👈 3. Order ke user field ko lock kiya
+                    order = Order.objects.create(
+                        user=request.user,
                         first_name=form.cleaned_data['first_name'],
                         phone=form.cleaned_data['phone'],
                         address=form.cleaned_data['address'],
                         city=form.cleaned_data['city'],
                         shipping_cost=shipping_cost,
-                        total_cost=0,
+                        total_cost=grand_total_display,
+                        payment_method='ONLINE',
+                        payment_status='UNPAID',
                         status='Pending',
                     )
-                    order.save()
 
-                    order_total = 0
                     for item in cart:
                         db_product = item['product']
-                        real_price = db_product.price
-
                         OrderItem.objects.create(
                             order=order,
                             product=db_product,
-                            price=real_price,
+                            price=db_product.price,
                             quantity=item['quantity']
                         )
 
-                        db_product.stock = max(0, db_product.stock - item['quantity'])
-                        db_product.save()
+                # 2. Call Official Safepay API to create session token
+                gateway = SafepayGatewayClient()
+                tracker_token, error_msg = gateway.create_order_tracker(order)
 
-                        order_total += real_price * item['quantity']
+                if tracker_token:
+                    # Save tracker token to order
+                    order.tracker_token = tracker_token
+                    order.payment_status = 'PROCESSING'
+                    order.save(update_fields=['tracker_token', 'payment_status'])
 
-                    order.total_cost = order_total + shipping_cost
-                    order.save()
+                    # 3. Construct Hosted Gateway URL
+                    redirect_url = request.build_absolute_uri(f'/payments/callback/{order.order_number}/')
+                    cancel_url = request.build_absolute_uri(f'/payments/cancel/{order.order_number}/')
+                    
+                    checkout_url = gateway.construct_checkout_url(
+                        tracker_token=tracker_token,
+                        order=order,
+                        redirect_url=redirect_url,
+                        cancel_url=cancel_url
+                    )
 
-                # Clear session cart
-                cart.clear()
+                    # 4. Redirect customer to Official Safepay Hosted Checkout Portal
+                    return redirect(checkout_url)
 
-                # Send fast HTTPS email notification
-                send_order_notification_email(order)
-
-                return redirect('orders:order_success', order_id=order.id)
+                else:
+                    # Gateway communication failed
+                    order.delete()
+                    messages.error(request, f"Unable to initialize payment gateway: {error_msg}")
 
             except Exception as e:
-                print(f"⚠️ Order placement error: {e}")
-                messages.error(request, "Something went wrong while placing your order. Please try again.")
-                return render(request, 'orders/checkout.html', {
-                    'form': form,
-                    'cart': cart,
-                    'subtotal': subtotal_display,
-                    'shipping_fee': shipping_cost,
-                    'grand_total': grand_total_display,
-                })
+                print(f"⚠️ Checkout Error: {e}")
+                messages.error(request, "An unexpected error occurred while setting up payment. Please try again.")
         else:
             messages.error(request, "Please correct the errors in the form below.")
     else:
-        # 👈 4. FORM PRE-FILL: Database se authenticated user ka data uthaya
+        # Pre-fill user information
         user_fullname = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
-        user_phone = ""
-        if hasattr(request.user, 'profile'):
-            user_phone = request.user.profile.phone or ""
-
-        # Pre-fill initial form fields
+        user_phone = request.user.profile.phone if hasattr(request.user, 'profile') else ""
         form = OrderCreateForm(initial={
             'first_name': user_fullname,
             'phone': user_phone
@@ -195,30 +190,22 @@ def checkout(request):
     return render(request, 'orders/checkout.html', context)
 
 
-@login_required  # Guard lagaya taake sirf orders place karne wala hi success page dekhe
+@login_required
 def order_success(request, order_id):
-    """
-    Renders order confirmation screen with 1-Click WhatsApp Connect button.
-    """
-    order = get_object_or_404(Order, id=order_id, user=request.user) # 👈 5. Secure check (Koi aur na dekh sake)
+    """Displays verified order invoice."""
+    order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order_success.html', {'order': order})
 
 
-@login_required  # Guard lagaya
+@login_required
 def order_history(request):
-    """
-    Shows order history for the current logged-in user.
-    """
-    # 👈 6. Purana session system khatam, authenticated user ke direct orders get kiye
+    """Lists customer orders."""
     orders = Order.objects.filter(user=request.user)
     return render(request, 'orders/order_history.html', {'orders': orders})
 
 
-@login_required  # Guard lagaya
+@login_required
 def order_detail(request, order_number):
-    """
-    Shows detailed view of a specific order for the customer.
-    """
-    # 👈 7. Security check: Sirf logged-in user apna order hi dekh sake
+    """Detailed invoice for specific order."""
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
     return render(request, 'orders/order_detail.html', {'order': order})

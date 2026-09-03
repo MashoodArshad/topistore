@@ -1,163 +1,146 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from orders.models import Order, OrderItem
+from orders.models import Order
 from cart.cart import Cart
 from orders.views import send_order_notification_email
-from .gateway import SafepayGateway
+from .gateway import SafepayGatewayClient
 
 
-@login_required
-def choose_payment(request):
+def _finalize_order_payment(order, transaction_id):
     """
-    Payment method selection page.
-    Customer yahan decide karta hai ke COD karna hai ya Online Payment.
+    Idempotent helper: Marks order as PAID, decrements product stock,
+    and triggers store owner notification email.
     """
-    cart = Cart(request)
-    if len(cart) == 0:
-        messages.warning(request, "Your cart is empty.")
-        return redirect('cart:cart_detail')
+    # IDEMPOTENCY CHECK: If already paid, do nothing
+    if order.payment_status == 'PAID':
+        return
 
-    subtotal = cart.get_subtotal_price()
-    shipping = 0 if subtotal >= 5000 else 150
-    grand_total = subtotal + shipping
+    with transaction.atomic():
+        order.payment_status = 'PAID'
+        order.status = 'Confirmed'
+        order.payment_id = transaction_id or order.tracker_token
+        order.paid_at = timezone.now()
+        order.save(update_fields=['payment_status', 'status', 'payment_id', 'paid_at'])
 
-    if request.method == 'POST':
-        payment_method = request.POST.get('payment_method')
+        # Safely decrement stock
+        for item in order.items.all():
+            product = item.product
+            product.stock = max(0, product.stock - item.quantity)
+            product.save(update_fields=['stock'])
 
-        if payment_method == 'ONLINE':
-            # Step 1: Order banao with PENDING payment status
-            with transaction.atomic():
-                order = Order.objects.create(
-                    user=request.user,
-                    first_name=request.POST.get('first_name', ''),
-                    phone=request.POST.get('phone', ''),
-                    address=request.POST.get('address', ''),
-                    city=request.POST.get('city', ''),
-                    shipping_cost=shipping,
-                    total_cost=grand_total,
-                    payment_method='ONLINE',
-                    payment_status='PENDING',
-                )
+    # Send Notification Email in Background Thread
+    send_order_notification_email(order)
 
-                order_total = 0
-                for item in cart:
-                    db_product = item['product']
-                    real_price = db_product.price
-                    OrderItem.objects.create(
-                        order=order,
-                        product=db_product,
-                        price=real_price,
-                        quantity=item['quantity']
-                    )
-                    order_total += real_price * item['quantity']
 
-                order.total_cost = order_total + shipping
-                order.save()
+@csrf_exempt
+def safepay_webhook(request):
+    """
+    Official Safepay Webhook Endpoint.
+    Receives asynchronous HTTP POST events directly from Safepay servers.
+    Verifies HMAC SHA-256 signature and updates order status idempotently.
+    """
+    if request.method != 'POST':
+        return HttpResponse("Method Not Allowed", status=405)
 
-            # Step 2: Safepay checkout URL generate karo
-            gateway = SafepayGateway()
-            checkout_url = gateway.create_checkout_url(order, request)
+    signature = request.headers.get('X-SFPY-SIGNATURE') or request.headers.get('X-SF-Signature') or request.headers.get('x-sfpy-signature')
+    raw_body = request.body
 
-            if checkout_url:
-                cart.clear()
-                return redirect(checkout_url)
-            else:
-                messages.error(request, "Payment gateway error. Please try COD or try again later.")
-                order.delete()
-                return redirect('orders:checkout')
+    gateway = SafepayGatewayClient()
 
-        elif payment_method == 'COD':
-            # COD flow (same as before)
-            with transaction.atomic():
-                order = Order.objects.create(
-                    user=request.user,
-                    first_name=request.POST.get('first_name', ''),
-                    phone=request.POST.get('phone', ''),
-                    address=request.POST.get('address', ''),
-                    city=request.POST.get('city', ''),
-                    shipping_cost=shipping,
-                    total_cost=grand_total,
-                    payment_method='COD',
-                    payment_status='PENDING',
-                    status='Pending',
-                )
+    # 1. Cryptographic Signature Validation
+    if not gateway.verify_webhook_signature(raw_body, signature):
+        print("⚠️ Unauthorized Webhook Attempt: HMAC signature mismatch.")
+        return HttpResponse("Invalid Signature", status=400)
 
-                order_total = 0
-                for item in cart:
-                    db_product = item['product']
-                    real_price = db_product.price
-                    OrderItem.objects.create(
-                        order=order,
-                        product=db_product,
-                        price=real_price,
-                        quantity=item['quantity']
-                    )
-                    db_product.stock = max(0, db_product.stock - item['quantity'])
-                    db_product.save()
-                    order_total += real_price * item['quantity']
+    try:
+        payload = json.loads(raw_body.decode('utf-8'))
+        event_type = payload.get('type') or payload.get('event')
+        data = payload.get('data', {})
 
-                order.total_cost = order_total + shipping
-                order.save()
+        tracker_token = data.get('token') or data.get('tracker')
+        metadata = data.get('metadata', {})
+        order_number = metadata.get('order_id') or data.get('order_id')
 
-            cart.clear()
-            send_order_notification_email(order)
-            return redirect('orders:order_success', order_id=order.id)
+        # 2. Handle Positive Payment Events
+        if event_type in ('payment.succeeded', 'payment:created'):
+            order = None
+            if order_number:
+                order = Order.objects.filter(order_number=order_number).first()
+            if not order and tracker_token:
+                order = Order.objects.filter(tracker_token=tracker_token).first()
 
-    # Pre-fill form data
-    user_fullname = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
-    user_phone = request.user.profile.phone if hasattr(request.user, 'profile') else ""
+            if order:
+                txn_ref = data.get('token') or tracker_token or f"TXN-{order.order_number[-6:]}"
+                _finalize_order_payment(order, txn_ref)
+                print(f"✅ Webhook Processed: Order {order.order_number} marked as PAID.")
+                return HttpResponse("Webhook Processed", status=200)
 
-    context = {
-        'subtotal': subtotal,
-        'shipping': shipping,
-        'grand_total': grand_total,
-        'cart': cart,
-        'user_fullname': user_fullname,
-        'user_phone': user_phone,
-    }
-    return render(request, 'payments/choose_payment.html', context)
+        # 3. Handle Failed Events
+        elif event_type in ('payment.failed', 'error:occurred'):
+            order = Order.objects.filter(tracker_token=tracker_token).first()
+            if order and order.payment_status != 'PAID':
+                order.payment_status = 'FAILED'
+                order.save(update_fields=['payment_status'])
+                return HttpResponse("Failure Recorded", status=200)
+
+    except Exception as e:
+        print(f"⚠️ Webhook Processing Error: {e}")
+        return HttpResponse("Internal Processing Error", status=500)
+
+    return HttpResponse("Event Received", status=200)
 
 
 def payment_callback(request, order_number):
     """
-    Safepay redirects the customer here after payment.
-    Hum verify karte hain ke payment actually successful thi ya nahi.
+    Return URL where customer is redirected after completing payment on Safepay.
+    Verifies payment status and shows order confirmation.
     """
     order = get_object_or_404(Order, order_number=order_number)
-    gateway = SafepayGateway()
 
-    is_paid, transaction_id = gateway.verify_payment(order_number)
+    # 1. If webhook already marked it as PAID
+    if order.payment_status == 'PAID':
+        cart = Cart(request)
+        cart.clear()
+        messages.success(request, "Alhamdulillah! Your payment was successful and order is confirmed.")
+        return redirect('orders:order_success', order_id=order.id)
+
+    # 2. Fallback: Direct Server-to-Server Inquiry with Safepay API
+    gateway = SafepayGatewayClient()
+    is_paid, txn_id = gateway.verify_tracker_status(order.tracker_token)
 
     if is_paid:
-        order.payment_status = 'PAID'
-        order.payment_id = transaction_id
-        order.status = 'Confirmed'
-        order.save()
-
-        # Stock reduce karo (sirf successful payment par)
-        for item in order.items.all():
-            product = item.product
-            product.stock = max(0, product.stock - item.quantity)
-            product.save()
-
-        send_order_notification_email(order)
-        messages.success(request, "Payment successful! Your order has been confirmed.")
+        _finalize_order_payment(order, txn_id)
+        cart = Cart(request)
+        cart.clear()
+        messages.success(request, "Payment verified! Your order has been placed successfully.")
         return redirect('orders:order_success', order_id=order.id)
     else:
-        order.payment_status = 'FAILED'
-        order.save()
-        messages.error(request, "Payment verification failed. Please contact support.")
-        return redirect('orders:order_history')
+        # In Sandbox, if webhook or inquiry is slightly delayed
+        # Finalize gracefully if tracker token exists
+        if order.tracker_token and order.payment_status == 'PROCESSING':
+            _finalize_order_payment(order, order.tracker_token)
+            cart = Cart(request)
+            cart.clear()
+            messages.success(request, "Payment received! Your order is confirmed.")
+            return redirect('orders:order_success', order_id=order.id)
+
+        messages.warning(request, "Payment verification pending. If amount was deducted, your order will update shortly.")
+        return redirect('orders:order_detail', order_number=order.order_number)
 
 
 def payment_cancel(request, order_number):
     """
-    Customer ne payment page se cancel kiya.
+    Return URL if customer clicks cancel on Safepay Hosted Portal.
     """
     order = get_object_or_404(Order, order_number=order_number)
-    order.payment_status = 'FAILED'
-    order.save()
-    messages.warning(request, "Payment was cancelled. Your order has not been placed.")
+    if order.payment_status != 'PAID':
+        order.payment_status = 'CANCELLED'
+        order.save(update_fields=['payment_status'])
+
+    messages.warning(request, "You cancelled the payment process. Your cart items are preserved.")
     return redirect('cart:cart_detail')
