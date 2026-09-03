@@ -10,11 +10,12 @@ cached_serve = cache_control(max_age=2592000, public=True, immutable=True)(serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-     path('accounts/', include('accounts.urls')),
+    path('accounts/', include('accounts.urls')),
     path('products/', include('products.urls', namespace='products')),
     path('cart/', include('cart.urls', namespace='cart')),
     path('checkout/', include('orders.urls', namespace='orders')),
     path('', include('core.urls', namespace='core')),
+    path('payments/', include('payments.urls')),
     
     # 📸 Fast production static and media routes with instant caching
     re_path(r'^media/(?P<path>.*)$', cached_serve, {'document_root': settings.MEDIA_ROOT}),
