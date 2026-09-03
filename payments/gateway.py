@@ -9,28 +9,42 @@ from django.conf import settings
 
 class SafepayGatewayClient:
     """
-    Official Safepay REST API Integration Client (v1 / v2).
-    Handles Tracker Initialization, Hosted Checkout Redirection,
-    HMAC Signature Validation, and Server-to-Server Status Inquiries.
+    Official Safepay REST API Client.
+    Strictly points to Sandbox or Production cluster.
     """
 
     def __init__(self):
-        self.api_key = settings.SAFEPAY_API_KEY
-        self.api_secret = settings.SAFEPAY_API_SECRET
-        self.webhook_secret = settings.SAFEPAY_WEBHOOK_SECRET
-        self.base_url = settings.SAFEPAY_BASE_URL
-        self.checkout_base_url = settings.SAFEPAY_CHECKOUT_URL
-        self.environment = settings.SAFEPAY_ENV
+        self.api_key = str(getattr(settings, 'SAFEPAY_API_KEY', '')).strip().strip('"').strip("'")
+        self.api_secret = str(getattr(settings, 'SAFEPAY_API_SECRET', '')).strip().strip('"').strip("'")
+        self.webhook_secret = str(getattr(settings, 'SAFEPAY_WEBHOOK_SECRET', '')).strip().strip('"').strip("'")
+        self.environment = str(getattr(settings, 'SAFEPAY_ENV', 'sandbox')).strip().lower()
+
+        # Dynamic Endpoint Routing
+        if self.environment == 'production':
+            self.base_url = 'https://api.getsafepay.com'
+            self.checkout_base_url = 'https://getsafepay.com/checkout/pay'
+        else:
+            self.base_url = 'https://sandbox.api.getsafepay.com'
+            self.checkout_base_url = 'https://sandbox.api.getsafepay.com/checkout/pay'
+
+    def _get_headers(self, extra_headers=None):
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        if extra_headers:
+            headers.update(extra_headers)
+        return headers
 
     def create_order_tracker(self, order):
         """
-        Registers order with Safepay API: POST /order/v1/init
-        Returns: (tracker_token: str, error_message: str)
+        Initializes an official Safepay order tracker.
+        Converts PKR to Paisa (1 PKR = 100 Paisa).
         """
         if not self.api_key:
-            return None, "SAFEPAY_API_KEY is not set in environment variables."
+            return None, "SAFEPAY_API_KEY is missing from .env"
 
-        # Convert PKR Decimal to integer Paisa (e.g. 1500.00 -> 150000)
         amount_paisa = int(round(float(order.total_cost) * 100))
 
         endpoint = f"{self.base_url}/order/v1/init"
@@ -41,46 +55,48 @@ class SafepayGatewayClient:
             "environment": self.environment
         }
 
-        headers = {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
+        print(f"\n🚀 [SAFEPAY DISPATCH] Endpoint: {endpoint}")
+        print(f"📦 [PAYLOAD] Client: {self.api_key[:6]}... | Amount: {amount_paisa} Paisa | Env: {self.environment}")
 
         try:
             req = urllib.request.Request(
                 endpoint,
                 data=json.dumps(payload).encode('utf-8'),
-                headers=headers,
+                headers=self._get_headers(),
                 method='POST'
             )
 
-            with urllib.request.urlopen(req, timeout=12) as response:
-                if response.status in (200, 201):
-                    raw_data = json.loads(response.read().decode('utf-8'))
-                    token = raw_data.get('data', {}).get('token')
-                    if token:
-                        return token, None
-                    return None, f"Malformed response from Safepay: {raw_data}"
-                return None, f"Safepay returned HTTP status {response.status}"
+            with urllib.request.urlopen(req, timeout=15) as response:
+                raw_data = json.loads(response.read().decode('utf-8'))
+                print(f"✅ [SAFEPAY RESPONSE]: {raw_data}\n")
+                
+                token = raw_data.get('data', {}).get('token')
+                if token:
+                    return token, None
+                return None, f"Malformed response: {raw_data}"
 
         except urllib.error.HTTPError as http_err:
             try:
                 error_body = json.loads(http_err.read().decode('utf-8'))
-                error_msg = error_body.get('status', {}).get('message', str(http_err))
+                status_obj = error_body.get('status', {})
+                message = status_obj.get('message', 'fail')
+                errors = status_obj.get('errors', [])
+                if errors:
+                    error_msg = f"{message}: {', '.join(str(e) for e in errors) if isinstance(errors, list) else str(errors)}"
+                else:
+                    error_msg = f"HTTP {http_err.code}: {message}"
             except Exception:
                 error_msg = f"HTTP Error {http_err.code}: {http_err.reason}"
+            print(f"❌ [SAFEPAY ERROR]: {error_msg}\n")
             return None, error_msg
 
         except urllib.error.URLError as url_err:
-            return None, f"Network connection error to Safepay: {url_err.reason}"
+            return None, f"Network Error: {url_err.reason}"
 
         except Exception as ex:
-            return None, f"Unexpected gateway exception: {str(ex)}"
+            return None, f"Gateway Error: {str(ex)}"
 
     def construct_checkout_url(self, tracker_token, order, redirect_url, cancel_url):
-        """
-        Constructs the official Safepay Hosted Checkout URL.
-        """
         params = {
             'beacon': tracker_token,
             'env': self.environment,
@@ -93,40 +109,27 @@ class SafepayGatewayClient:
         return f"{self.checkout_base_url}?{query_string}"
 
     def verify_tracker_status(self, tracker_token):
-        """
-        Direct API Inquiry: Queries Safepay to check if a tracker token is paid.
-        Returns: (is_paid: bool, transaction_reference: str)
-        """
         if not tracker_token:
             return False, ""
 
         endpoint = f"{self.base_url}/order/v1/tracker/{tracker_token}"
-        headers = {
-            "Accept": "application/json",
-            "X-SFPY-MERCHANT-SECRET": self.api_secret
-        }
+        headers = self._get_headers({"X-SFPY-MERCHANT-SECRET": self.api_secret})
 
         try:
             req = urllib.request.Request(endpoint, headers=headers, method='GET')
-            with urllib.request.urlopen(req, timeout=10) as response:
+            with urllib.request.urlopen(req, timeout=12) as response:
                 if response.status == 200:
                     data = json.loads(response.read().decode('utf-8'))
-                    tracker_data = data.get('data', {})
-                    state = tracker_data.get('state', '').upper()
-                    token = tracker_data.get('token', tracker_token)
-
-                    # State 'TRACKER_ENDED' or 'PAID' or 'COMPLETED' indicates success
+                    state = data.get('data', {}).get('state', '').upper()
+                    token = data.get('data', {}).get('token', tracker_token)
                     if state in ('PAID', 'COMPLETED', 'TRACKER_ENDED'):
                         return True, token
         except Exception as e:
-            print(f"⚠️ Direct Tracker Inquiry Notice: {e}")
+            print(f"⚠️ Tracker inquiry notice: {e}")
 
         return False, ""
 
     def verify_webhook_signature(self, raw_body_bytes, received_signature):
-        """
-        Validates HMAC SHA-256 digital signature sent in webhook headers.
-        """
         if not self.webhook_secret or not received_signature:
             return False
 

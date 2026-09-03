@@ -188,3 +188,18 @@ EMAIL_TIMEOUT = 5  # Seconds timeout so it never hangs
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'core:home'
 LOGIN_URL = 'accounts:login'
+# ==========================================
+# 💳 OFFICIAL SAFEPAY PAYMENT CONFIGURATION
+# ==========================================
+SAFEPAY_ENV = os.getenv('SAFEPAY_ENV', 'sandbox').strip().lower()
+
+if SAFEPAY_ENV == 'production':
+    SAFEPAY_BASE_URL = 'https://api.getsafepay.com'
+    SAFEPAY_CHECKOUT_URL = 'https://getsafepay.com/checkout/pay'
+else:
+    SAFEPAY_BASE_URL = 'https://sandbox.api.getsafepay.com'
+    SAFEPAY_CHECKOUT_URL = 'https://sandbox.api.getsafepay.com/checkout/pay'
+
+SAFEPAY_API_KEY = os.getenv('SAFEPAY_API_KEY', '').strip().strip('"').strip("'")
+SAFEPAY_API_SECRET = os.getenv('SAFEPAY_API_SECRET', '').strip().strip('"').strip("'")
+SAFEPAY_WEBHOOK_SECRET = os.getenv('SAFEPAY_WEBHOOK_SECRET', '').strip().strip('"').strip("'")

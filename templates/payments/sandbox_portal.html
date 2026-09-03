@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% block title %}Secure Payment Gateway — Shah G Cap House{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-5 py-12 relative">
+    
+    <!-- ========================================== -->
+    <!-- 📱 REALISTIC SMS PUSH NOTIFICATION TOAST === -->
+    <!-- ========================================== -->
+    <div id="sms-toast" class="fixed top-24 right-5 max-w-sm w-full bg-slate-900/95 text-white rounded-2xl shadow-2xl border border-slate-800 p-4 transform translate-x-96 opacity-0 transition-all duration-500 z-[9999] pointer-events-none">
+        <div class="flex items-start gap-3">
+            <div class="w-9 h-9 bg-emerald-600 rounded-full flex items-center justify-center font-black text-xs text-white shadow">
+                💬
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-emerald-400 tracking-wider uppercase" id="sms-sender">Easypaisa SMS</span>
+                    <span class="text-[9px] text-slate-400 font-bold uppercase">Just Now</span>
+                </div>
+                <p class="text-xs text-slate-200 mt-1 font-semibold leading-relaxed" id="sms-body">
+                    Loading verification code...
+                </p>
+            </div>
+        </div>
+    </div>
+    <!-- ========================================== -->
+
+    <!-- Outer Payment Container -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden relative">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 via-emerald-600 to-blue-600"></div>
+
+        <!-- Header -->
+        <div class="p-8 pb-4 text-center border-b border-slate-100 bg-slate-50/50">
+            <span class="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-full uppercase tracking-widest">
+                🔒 Secure 256-Bit SSL Gateway
+            </span>
+            <h2 class="text-xl font-black uppercase text-brand-dark tracking-tight mt-3">Payment Authorization</h2>
+            <p class="text-xs text-slate-500 font-medium mt-1">
+                Order <span class="font-bold text-slate-700">{{ order.order_number }}</span> · Payable Total: 
+                <span class="text-brand-emerald font-black text-sm">Rs. {{ order.total_cost|floatformat:0 }}</span>
+            </p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex border-b border-slate-100 text-xs font-black uppercase tracking-wider">
+            <button id="tab-wallet" class="flex-1 py-4 text-center border-b-2 border-emerald-600 text-emerald-600 focus:outline-none">
+                📱 JazzCash / Easypaisa
+            </button>
+            <button id="tab-card" class="flex-1 py-4 text-center border-b-2 border-transparent text-slate-400 hover:text-brand-dark focus:outline-none">
+                💳 Visa / Mastercard
+            </button>
+        </div>
+
+        <div class="p-8">
+            
+            <!-- 📱 WALLET FORM WITH REAL SIMULATED SMS OTP -->
+            <form id="form-wallet" class="space-y-4">
+                {% csrf_token %}
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Select Mobile Wallet</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="wallet_type" value="jazzcash" id="radio-jc" class="hidden peer" checked>
+                            <div class="peer-checked:border-red-600 peer-checked:bg-red-50 border-2 border-slate-100 rounded-xl p-3 text-center text-xs font-extrabold uppercase transition text-slate-600">
+                                JazzCash
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="wallet_type" value="easypaisa" id="radio-ep" class="hidden peer">
+                            <div class="peer-checked:border-emerald-600 peer-checked:bg-emerald-50 border-2 border-slate-100 rounded-xl p-3 text-center text-xs font-extrabold uppercase transition text-slate-600">
+                                Easypaisa
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Wallet Account Phone Number</label>
+                    <input type="text" id="wallet-phone" required maxlength="11" placeholder="e.g. 03297185977" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm transition font-mono tracking-wider">
+                </div>
+
+                <!-- OTP Alert Details -->
+                <div id="otp-alert" class="hidden text-xs font-bold p-3 rounded-xl"></div>
+
+                <!-- OTP Input -->
+                <div id="otp-section" class="space-y-2 hidden bg-slate-50 border border-slate-200 rounded-2xl p-5">
+                    <label class="text-xs font-extrabold uppercase tracking-wider text-brand-dark block text-center">
+                        Enter 4-Digit OTP Code
+                    </label>
+                    <input type="text" id="wallet-otp" maxlength="4" placeholder="••••" class="w-32 px-4 py-3 rounded-xl border-2 border-emerald-500 focus:outline-none text-center text-2xl font-black tracking-widest block mx-auto bg-white font-mono">
+                </div>
+
+                <button id="wallet-submit-btn" type="submit" class="w-full bg-brand-emerald hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-widest py-4 rounded-xl shadow-lg transition mt-4">
+                    Send Verification OTP 📩
+                </button>
+            </form>
+
+            <!-- 💳 CARD FORM -->
+            <form id="form-card" class="space-y-4 hidden">
+                {% csrf_token %}
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Name on Card</label>
+                    <input type="text" id="card-name" required placeholder="Mashood Arshad" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Card Number</label>
+                    <input type="text" id="card-number" required maxlength="19" placeholder="4242 4242 4242 4242" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition font-mono tracking-wider">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Expiry Date</label>
+                        <input type="text" id="card-expiry" required maxlength="5" placeholder="MM/YY" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition text-center font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500">CVV / CVC</label>
+                        <input type="password" id="card-cvv" required maxlength="3" placeholder="•••" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition text-center font-mono">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs uppercase tracking-widest py-4 rounded-xl shadow-lg transition mt-4">
+                    Pay via Card (Rs. {{ order.total_cost|floatformat:0 }})
+                </button>
+            </form>
+
+            <!-- Loading Spinner Overlay -->
+            <div id="processing-overlay" class="hidden absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-center p-8 z-50">
+                <div class="w-14 h-14 border-4 border-slate-200 border-t-brand-emerald rounded-full animate-spin"></div>
+                <h3 class="text-base font-black text-brand-dark mt-4 uppercase tracking-tight" id="loader-title">Verifying Payment...</h3>
+                <p class="text-xs text-slate-500 mt-1 max-w-xs" id="loader-desc">Please wait while the server secures your transaction.</p>
+            </div>
+
+        </div>
+
+        <div class="p-5 border-t border-slate-100 bg-slate-50/50 text-center">
+            <a href="{% url 'payments:payment_cancel' order.order_number %}" class="text-[10px] text-slate-400 hover:text-brand-red font-black uppercase tracking-widest">
+                ✕ Cancel Payment & Return
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab switching
+    const tabWallet = document.getElementById('tab-wallet');
+    const tabCard = document.getElementById('tab-card');
+    const formWallet = document.getElementById('form-wallet');
+    const formCard = document.getElementById('form-card');
+
+    tabWallet.addEventListener('click', () => {
+        tabWallet.className = "flex-1 py-4 text-center border-b-2 border-emerald-600 text-emerald-600 focus:outline-none";
+        tabCard.className = "flex-1 py-4 text-center border-b-2 border-transparent text-slate-400 hover:text-brand-dark focus:outline-none";
+        formWallet.classList.remove('hidden');
+        formCard.classList.add('hidden');
+    });
+
+    tabCard.addEventListener('click', () => {
+        tabCard.className = "flex-1 py-4 text-center border-b-2 border-blue-600 text-blue-600 focus:outline-none";
+        tabWallet.className = "flex-1 py-4 text-center border-b-2 border-transparent text-slate-400 hover:text-brand-dark focus:outline-none";
+        formCard.classList.remove('hidden');
+        formWallet.classList.add('hidden');
+    });
+
+    // Real-Time Simulator Flow
+    let step = 1;
+    const walletBtn = document.getElementById('wallet-submit-btn');
+    const otpSection = document.getElementById('otp-section');
+    const otpAlert = document.getElementById('otp-alert');
+    const overlay = document.getElementById('processing-overlay');
+    
+    // SMS Toast elements
+    const smsToast = document.getElementById('sms-toast');
+    const smsSender = document.getElementById('sms-sender');
+    const smsBody = document.getElementById('sms-body');
+
+    formWallet.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        if (step === 1) {
+            walletBtn.disabled = true;
+            walletBtn.innerText = "Processing OTP Request...";
+
+            try {
+                // Call server to generate OTP
+                const res = await fetch("{% url 'payments:send_otp' order.order_number %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    otpSection.classList.remove('hidden');
+                    otpAlert.classList.remove('hidden');
+                    otpAlert.className = "text-xs font-bold p-3 rounded-xl bg-slate-50 text-slate-600 border border-slate-200 block text-center";
+                    otpAlert.innerText = "📲 Authorization Request Sent. Watch your phone screen for SMS notification!";
+                    
+                    document.getElementById('wallet-phone').disabled = true;
+                    walletBtn.disabled = false;
+                    walletBtn.innerText = "Confirm Payment (Rs. {{ order.total_cost|floatformat:0 }})";
+                    step = 2;
+
+                    // 📱 SHOW REALISTIC SMS PUSH NOTIFICATION TOAST
+                    const selectedWallet = document.getElementById('radio-jc').checked ? 'JazzCash' : 'Easypaisa';
+                    smsSender.innerText = selectedWallet + " OTP";
+                    smsBody.innerHTML = `Your OTP verification code for Shah G Cap House order is <b class="text-white text-sm tracking-widest font-black">${data.dev_otp}</b>. Valid for 5 minutes.`;
+                    
+                    // Slide down SMS notification with 1 second standard network delay
+                    setTimeout(() => {
+                        smsToast.classList.remove('translate-x-96', 'opacity-0');
+                        smsToast.classList.add('translate-x-0', 'opacity-100');
+                    }, 1000);
+
+                    // Auto hide SMS notification after 10 seconds
+                    setTimeout(() => {
+                        smsToast.classList.remove('translate-x-0', 'opacity-100');
+                        smsToast.classList.add('translate-x-96', 'opacity-0');
+                    }, 10000);
+
+                } else {
+                    alert(data.message);
+                    walletBtn.disabled = false;
+                    walletBtn.innerText = "Send Verification OTP 📩";
+                }
+            } catch (err) {
+                alert("Connection failed. Try again.");
+                walletBtn.disabled = false;
+            }
+
+        } else if (step === 2) {
+            const userOtp = document.getElementById('wallet-otp').value.trim();
+            if (userOtp.length !== 4) {
+                otpAlert.className = "text-xs font-bold p-3 rounded-xl bg-red-50 text-red-700 border border-red-200 block text-center";
+                otpAlert.innerText = "⚠️ Please enter the full 4-digit code.";
+                return;
+            }
+
+            walletBtn.disabled = true;
+            overlay.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append('otp', userOtp);
+            formData.append('csrfmiddlewaretoken', csrfToken);
+
+            try {
+                const res = await fetch("{% url 'payments:verify_wallet' order.order_number %}", {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-CSRFToken': csrfToken }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    overlay.classList.add('hidden');
+                    walletBtn.disabled = false;
+                    otpAlert.className = "text-xs font-bold p-3 rounded-xl bg-red-50 text-red-700 border border-red-200 block text-center";
+                    otpAlert.innerText = data.message;
+                }
+            } catch (err) {
+                overlay.classList.add('hidden');
+                walletBtn.disabled = false;
+                alert("Verification failed. Please try again.");
+            }
+        }
+    });
+
+    // Card submit
+    formCard.addEventListener('submit', (e) => {
+        e.preventDefault();
+        overlay.classList.remove('hidden');
+        setTimeout(() => {
+            window.location.href = "{% url 'payments:payment_callback' order.order_number %}";
+        }, 3000);
+    });
+</script>
+
+<style>
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 1s linear infinite; }
+</style>
+{% endblock %}

@@ -1,5 +1,6 @@
 import os
 import json
+import traceback
 import urllib.request
 import threading
 from django.shortcuts import render, redirect, get_object_or_404
@@ -112,6 +113,7 @@ def checkout(request):
         form = OrderCreateForm(request.POST)
 
         if form.is_valid():
+            order = None
             try:
                 # 1. Create UNPAID Order in Database
                 with transaction.atomic():
@@ -142,7 +144,6 @@ def checkout(request):
                 tracker_token, error_msg = gateway.create_order_tracker(order)
 
                 if tracker_token:
-                    # Save tracker token to order
                     order.tracker_token = tracker_token
                     order.payment_status = 'PROCESSING'
                     order.save(update_fields=['tracker_token', 'payment_status'])
@@ -158,21 +159,23 @@ def checkout(request):
                         cancel_url=cancel_url
                     )
 
-                    # 4. Redirect customer to Official Safepay Hosted Checkout Portal
+                    # 4. Redirect customer to Official Safepay Hosted Portal
                     return redirect(checkout_url)
 
                 else:
-                    # Gateway communication failed
-                    order.delete()
-                    messages.error(request, f"Unable to initialize payment gateway: {error_msg}")
+                    if order:
+                        order.delete()
+                    messages.error(request, f"Safepay Gateway Error: {error_msg}")
 
             except Exception as e:
-                print(f"⚠️ Checkout Error: {e}")
-                messages.error(request, "An unexpected error occurred while setting up payment. Please try again.")
+                print(f"⚠️ Checkout Detailed Error: {traceback.format_exc()}")
+                if order and order.id:
+                    order.delete()
+                messages.error(request, f"Gateway Connection Error: {str(e)}")
         else:
             messages.error(request, "Please correct the errors in the form below.")
     else:
-        # Pre-fill user information
+        # Pre-fill user details
         user_fullname = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
         user_phone = request.user.profile.phone if hasattr(request.user, 'profile') else ""
         form = OrderCreateForm(initial={
@@ -192,20 +195,17 @@ def checkout(request):
 
 @login_required
 def order_success(request, order_id):
-    """Displays verified order invoice."""
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order_success.html', {'order': order})
 
 
 @login_required
 def order_history(request):
-    """Lists customer orders."""
     orders = Order.objects.filter(user=request.user)
     return render(request, 'orders/order_history.html', {'orders': orders})
 
 
 @login_required
 def order_detail(request, order_number):
-    """Detailed invoice for specific order."""
     order = get_object_or_404(Order, order_number=order_number, user=request.user)
     return render(request, 'orders/order_detail.html', {'order': order})
