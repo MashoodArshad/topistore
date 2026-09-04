@@ -4,7 +4,6 @@
 {% block content %}
 <div class="max-w-4xl mx-auto px-5 py-12">
 
-    <!-- Page Header -->
     <div class="text-center mb-10">
         <h1 class="text-3xl font-black uppercase text-brand-dark tracking-tight">SECURE CHECKOUT</h1>
         <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Official Online Payment Gateway (Safepay)</p>
@@ -12,7 +11,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- Left Column: Shipping Information Form (2 cols) -->
+        <!-- Left Column: Shipping Form (2 cols) -->
         <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-xl p-8 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-brand-emerald"></div>
 
@@ -36,7 +35,6 @@
                 </div>
                 {% endfor %}
 
-                <!-- Official Payment Notice -->
                 <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 mt-6">
                     <div class="flex items-center gap-3">
                         <div class="w-9 h-9 bg-brand-emerald text-white rounded-xl flex items-center justify-center font-black text-sm shadow">
@@ -65,7 +63,6 @@
 
                 <h3 class="text-sm font-black uppercase tracking-wider text-brand-dark mb-4">Order Summary</h3>
 
-                <!-- Cart Items List -->
                 <div class="space-y-3 divide-y divide-slate-100 max-h-64 overflow-y-auto pr-1">
                     {% for item in cart %}
                     <div class="pt-3 first:pt-0 flex items-center justify-between text-xs">
@@ -78,7 +75,6 @@
                     {% endfor %}
                 </div>
 
-                <!-- Financial Breakdown -->
                 <div class="border-t border-slate-200 mt-5 pt-4 space-y-2 text-xs font-semibold">
                     <div class="flex justify-between text-slate-500">
                         <span>Subtotal</span>
@@ -86,7 +82,7 @@
                     </div>
                     <div class="flex justify-between text-slate-500">
                         <span>Shipping Delivery</span>
-                        <span>{% if shipping_fee == 0 %}FREE{% else %}Rs. {{ shipping_fee }}{% endif %}</span>
+                        <span>Rs. {{ shipping_fee|floatformat:0 }}</span>
                     </div>
                     <div class="flex justify-between text-brand-dark font-black text-sm border-t border-slate-200 pt-3">
                         <span>Grand Total</span>
@@ -95,7 +91,6 @@
                 </div>
             </div>
 
-            <!-- Accepted Payment Badges -->
             <div class="bg-white rounded-2xl border border-slate-200 p-4 text-center">
                 <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Supported Payment Channels</p>
                 <div class="flex items-center justify-center gap-2 flex-wrap">

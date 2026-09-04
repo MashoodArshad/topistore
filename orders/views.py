@@ -1,6 +1,5 @@
 import os
 import json
-import traceback
 import urllib.request
 import threading
 from django.shortcuts import render, redirect, get_object_or_404
@@ -12,6 +11,7 @@ from payments.gateway import SafepayGatewayClient
 from .models import Order, OrderItem
 from .forms import OrderCreateForm
 
+FLAT_SHIPPING_FEE = 150  # Fixed nationwide delivery fee
 
 def _send_email_via_resend_api(subject, message_text, recipient_email):
     """Sends fast transactional email via Resend API."""
@@ -90,14 +90,13 @@ This order has been verified. Dispatch parcel to customer.
         email_thread.start()
 
     except Exception as e:
-        print(f"⚠️ Email notification preparation error: {e}")
+        print(f"⚠️ Email notification error: {e}")
 
 
 @login_required
 def checkout(request):
     """
-    Handles checkout form validation, creates UNPAID Order,
-    initializes Safepay payment session, and redirects to Safepay Hosted Portal.
+    Handles checkout with flat Rs. 150 shipping fee for all orders.
     """
     cart = Cart(request)
 
@@ -106,7 +105,7 @@ def checkout(request):
         return redirect('cart:cart_detail')
 
     subtotal_display = cart.get_subtotal_price()
-    shipping_cost = 0 if subtotal_display >= 5000 else 150
+    shipping_cost = FLAT_SHIPPING_FEE
     grand_total_display = subtotal_display + shipping_cost
 
     if request.method == 'POST':
@@ -115,7 +114,7 @@ def checkout(request):
         if form.is_valid():
             order = None
             try:
-                # 1. Create UNPAID Order in Database
+                # 1. Create UNPAID Order
                 with transaction.atomic():
                     order = Order.objects.create(
                         user=request.user,
@@ -139,7 +138,7 @@ def checkout(request):
                             quantity=item['quantity']
                         )
 
-                # 2. Call Official Safepay API to create session token
+                # 2. Safepay Tracker Initialization
                 gateway = SafepayGatewayClient()
                 tracker_token, error_msg = gateway.create_order_tracker(order)
 
@@ -148,7 +147,6 @@ def checkout(request):
                     order.payment_status = 'PROCESSING'
                     order.save(update_fields=['tracker_token', 'payment_status'])
 
-                    # 3. Construct Hosted Gateway URL
                     redirect_url = request.build_absolute_uri(f'/payments/callback/{order.order_number}/')
                     cancel_url = request.build_absolute_uri(f'/payments/cancel/{order.order_number}/')
                     
@@ -159,23 +157,19 @@ def checkout(request):
                         cancel_url=cancel_url
                     )
 
-                    # 4. Redirect customer to Official Safepay Hosted Portal
                     return redirect(checkout_url)
-
                 else:
                     if order:
                         order.delete()
                     messages.error(request, f"Safepay Gateway Error: {error_msg}")
 
             except Exception as e:
-                print(f"⚠️ Checkout Detailed Error: {traceback.format_exc()}")
                 if order and order.id:
                     order.delete()
                 messages.error(request, f"Gateway Connection Error: {str(e)}")
         else:
             messages.error(request, "Please correct the errors in the form below.")
     else:
-        # Pre-fill user details
         user_fullname = f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username
         user_phone = request.user.profile.phone if hasattr(request.user, 'profile') else ""
         form = OrderCreateForm(initial={

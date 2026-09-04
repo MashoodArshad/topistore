@@ -1,181 +1,166 @@
 {% extends 'base.html' %}
-
 {% block title %}Shopping Bag — Shah G Cap House{% endblock %}
 
 {% block content %}
+{% csrf_token %}
 
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
-    
-    <!-- Title Header -->
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b-2 border-slate-200 mb-8">
-        <div>
-            <span class="text-[10px] sm:text-xs font-black uppercase tracking-widest text-emerald-800 block mb-1">Your Selection</span>
-            <h1 class="text-2xl sm:text-5xl font-black tracking-tight text-slate-900 uppercase">Shopping Bag</h1>
-        </div>
-        <a href="{% url 'products:product_list' %}" class="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider text-emerald-800 hover:underline">
-            ← Continue Shopping
-        </a>
+<div class="max-w-5xl mx-auto px-5 py-12">
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-black uppercase text-brand-dark tracking-tight">YOUR SHOPPING BAG</h1>
+        <p class="text-xs text-slate-500 uppercase tracking-widest mt-1">Review your selected premium articles</p>
     </div>
 
     {% if cart %}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- LEFT: Items List (7 Columns) -->
-        <div class="lg:col-span-8 space-y-4">
-            
+        <!-- Cart Items List (2 Columns) -->
+        <div class="lg:col-span-2 space-y-4">
             {% for item in cart %}
-            <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-md p-6 flex flex-col sm:flex-row items-center gap-5 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-2 h-full bg-brand-emerald"></div>
+                
+                <!-- Product Image -->
+                <div class="w-20 h-20 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+
+                <!-- Product Info & Quantity Controls -->
+                <div class="flex-grow text-center sm:text-left space-y-2">
+                    <h3 class="font-black text-brand-dark uppercase text-sm tracking-tight">{{ item.product.name }}</h3>
+                    <p class="text-xs text-brand-emerald font-bold">Rs. {{ item.price|floatformat:0 }}</p>
                     
-                    <!-- Img + Details -->
-                    <div class="flex items-center gap-4 w-full sm:w-auto">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-950 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200">
-                            {% if item.product.image %}
-                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
-                            {% else %}
-                                <div class="w-full h-full flex items-center justify-center text-slate-700 text-2xl">☪</div>
-                            {% endif %}
-                        </div>
+                    <div class="flex items-center border border-slate-200 rounded-xl overflow-hidden bg-slate-50 w-fit mx-auto sm:mx-0">
+                        <input type="hidden" name="quantity" id="qty-input-{{ item.product.id }}" value="{{ item.quantity }}">
                         
-                        <div class="space-y-1">
-                            <span class="text-[8px] sm:text-[9px] font-extrabold uppercase tracking-widest text-emerald-800 block">
-                                {{ item.product.category.name }}
-                            </span>
-                            <h3 class="text-sm sm:text-lg font-black text-slate-900 uppercase">
-                                <a href="/products/{{ item.product.slug }}/" class="hover:text-emerald-800 transition">
-                                    {{ item.product.name }}
-                                </a>
-                            </h3>
-                            <p class="text-[10px] sm:text-xs font-bold text-slate-500">
-                                Unit: <span class="text-red-600 font-extrabold">Rs. {{ item.price|floatformat:0 }}</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Quantity Controls + Total + Remove -->
-                    <div class="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto ml-20 sm:ml-0">
+                        <button type="button" onclick="updateQty('{{ item.product.id }}', -1, {{ item.product.stock }})" 
+                                class="px-3 py-2 text-slate-800 hover:bg-slate-200 font-extrabold transition text-sm">-</button>
                         
-                        <!-- Interactive +/- Quantity Form -->
-                        <form method="post" action="{% url 'cart:cart_update' item.product.id %}" class="flex items-center border-2 border-slate-300 rounded-xl overflow-hidden bg-slate-50" id="qty-form-{{ item.product.id }}">
-                            {% csrf_token %}
-                            <input type="hidden" name="quantity" id="qty-input-{{ item.product.id }}" value="{{ item.quantity }}">
-                            <button type="button" onclick="updateQty('{{ item.product.id }}', -1, {{ item.product.stock }})" 
-                                    class="px-3 py-2 text-slate-800 hover:bg-slate-200 font-extrabold transition text-sm">−</button>
-                            <span class="px-3 py-2 text-xs sm:text-sm font-black text-slate-900 min-w-[28px] text-center" id="qty-display-{{ item.product.id }}">
-                                {{ item.quantity }}
-                            </span>
-                            <button type="button" onclick="updateQty('{{ item.product.id }}', 1, {{ item.product.stock }})" 
-                                    class="px-3 py-2 text-slate-800 hover:bg-slate-200 font-extrabold transition text-sm">+</button>
-                        </form>
-
-                        <!-- Item Total -->
-                        <div class="text-right min-w-[70px]">
-                            <span class="text-sm sm:text-base font-black text-slate-900 block">
-                                Rs. {{ item.total_price|floatformat:0 }}
-                            </span>
-                        </div>
-
-                        <!-- Remove Button -->
-                        <form method="post" action="{% url 'cart:cart_remove' item.product.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="text-[10px] sm:text-[11px] font-bold text-red-600 hover:text-red-800 uppercase tracking-wider transition">
-                                ✕
-                            </button>
-                        </form>
-
+                        <span class="px-3 py-2 text-xs sm:text-sm font-black text-slate-900 min-w-[28px] text-center" id="qty-display-{{ item.product.id }}">
+                            {{ item.quantity }}
+                        </span>
+                        
+                        <button type="button" onclick="updateQty('{{ item.product.id }}', 1, {{ item.product.stock }})" 
+                                class="px-3 py-2 text-slate-800 hover:bg-slate-200 font-extrabold transition text-sm">+</button>
                     </div>
+                </div>
 
+                <!-- Price and Actions -->
+                <div class="text-center sm:text-right flex sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-100">
+                    <div class="mb-2">
+                        <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Subtotal</span>
+                        <span class="font-black text-brand-emerald text-sm sm:text-base" id="item-subtotal-{{ item.product.id }}">
+                            Rs. {{ item.total_price|floatformat:0 }}
+                        </span>
+                    </div>
+                    <a href="{% url 'cart:cart_remove' item.product.id %}" class="text-[10px] font-black uppercase tracking-wider text-brand-red border border-red-100 bg-red-50 hover:bg-brand-red hover:text-white px-3 py-2 rounded-xl transition">
+                        Remove
+                    </a>
                 </div>
             </div>
             {% endfor %}
-
         </div>
 
-        <!-- RIGHT: Order Summary Card (5 Columns) -->
-        <div class="lg:col-span-4 bg-white border border-slate-200 p-5 sm:p-8 rounded-3xl shadow-sm space-y-5 sm:space-y-6 sticky top-28">
-            <h3 class="text-lg sm:text-xl font-black uppercase tracking-tight text-slate-900 border-b border-slate-200 pb-4">
-                Order Summary
-            </h3>
-            
-            <div class="space-y-3 sm:space-y-3.5 text-xs sm:text-sm font-bold text-slate-600">
-                <div class="flex justify-between">
-                    <span>Subtotal</span>
-                    <span class="text-slate-900 font-black">Rs. {{ subtotal|floatformat:0 }}</span>
-                </div>
+        <!-- Order Summary (1 Column) -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 relative overflow-hidden sticky top-28">
+                <div class="absolute top-0 left-0 w-full h-2 bg-brand-dark"></div>
+
+                <h3 class="text-sm font-black uppercase tracking-wider text-brand-dark mb-4">Summary</h3>
                 
-                <div class="flex justify-between">
-                    <span>Shipping Fee</span>
-                    <span>
-                        {% if shipping_fee == 0 %}
-                            <span class="text-emerald-700 font-black">FREE</span>
-                        {% else %}
-                            <span class="text-slate-900 font-black">Rs. {{ shipping_fee|floatformat:0 }}</span>
-                        {% endif %}
-                    </span>
+                <div class="space-y-3 text-xs font-semibold border-b border-slate-100 pb-4 mb-4">
+                    <div class="flex justify-between text-slate-500">
+                        <span>Cart Subtotal</span>
+                        <span id="cart-subtotal">Rs. {{ subtotal|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500">
+                        <span>Shipping Delivery</span>
+                        <span>Rs. {{ shipping_fee|floatformat:0 }}</span>
+                    </div>
                 </div>
 
-                {% if shipping_fee > 0 %}
-                <p class="text-[10px] text-slate-400 font-medium">Add items worth Rs. 5,000 for Free Shipping!</p>
-                {% endif %}
-
-                <div class="border-t-2 border-slate-200 pt-4 flex justify-between items-baseline">
-                    <span class="text-sm sm:text-base font-black text-slate-900 uppercase">Total</span>
-                    <span class="text-2xl sm:text-3xl font-black text-red-600">Rs. {{ grand_total|floatformat:0 }}</span>
+                <div class="flex justify-between text-brand-dark font-black text-sm mb-6">
+                    <span>Payable Total</span>
+                    <span class="text-brand-emerald text-lg" id="cart-grandtotal">Rs. {{ grand_total|floatformat:0 }}</span>
                 </div>
-            </div>
 
-            <div class="pt-2">
-                <a href="{% url 'orders:checkout' %}" 
-                   class="w-full bg-slate-900 hover:bg-emerald-900 text-white font-black text-xs uppercase tracking-widest py-3.5 sm:py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-md">
-                    <span>Proceed to Checkout</span>
-                    <span>→</span>
+                <a href="{% url 'orders:checkout' %}" class="w-full bg-brand-emerald hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-widest py-4 px-6 rounded-xl shadow-lg transition duration-300 transform active:scale-95 block text-center">
+                    PROCEED TO CHECKOUT
                 </a>
             </div>
-
-            <p class="text-[10px] text-center text-slate-400 font-bold uppercase tracking-wider">
-                🔒 Cash on Delivery Across Pakistan
-            </p>
         </div>
 
     </div>
-
     {% else %}
-    <!-- Empty Cart Shell -->
-    <div class="bg-white border border-slate-200 rounded-3xl p-10 sm:p-12 text-center max-w-lg mx-auto space-y-4 shadow-sm">
-        <span class="text-5xl block">🛍️</span>
-        <h2 class="text-xl sm:text-2xl font-black uppercase text-slate-900">Your Bag is Empty</h2>
-        <p class="text-xs text-slate-500 font-medium max-w-xs mx-auto">
-            You haven't added any premium articles yet. Browse our exclusive collection to choose your cap.
-        </p>
-        <a href="{% url 'products:product_list' %}" class="inline-block bg-slate-900 text-white font-extrabold text-xs uppercase tracking-widest px-8 py-3.5 rounded-xl hover:bg-emerald-800 transition shadow">
-            Explore Collection →
+    <div class="text-center py-16 bg-white border border-slate-200 rounded-3xl shadow">
+        <span class="text-5xl block mb-4">🛍️</span>
+        <h2 class="text-lg font-black text-brand-dark uppercase">Your Bag is Empty</h2>
+        <p class="text-xs text-slate-400 mt-1">Please select an article from our premium collection.</p>
+        <a href="{% url 'products:product_list' %}" class="inline-block mt-6 bg-brand-emerald hover:bg-emerald-800 text-white font-extrabold text-xs uppercase tracking-widest py-3 px-6 rounded-xl shadow transition">
+            Browse Articles
         </a>
     </div>
     {% endif %}
-
 </div>
 
-<!-- ===== INLINE JAVASCRIPT FOR QUANTITY UPDATE ===== -->
 <script>
-    function updateQty(productId, change, maxStock) {
-        const input = document.getElementById('qty-input-' + productId);
-        const display = document.getElementById('qty-display-' + productId);
-        const form = document.getElementById('qty-form-' + productId);
-        
-        let currentQty = parseInt(input.value) || 1;
-        let newQty = currentQty + change;
-        
-        // Clamp between 1 and max stock
-        if (newQty < 1) newQty = 1;
-        if (newQty > maxStock) newQty = maxStock;
-        
-        // Only submit if quantity actually changed
-        if (newQty !== currentQty) {
-            input.value = newQty;
-            display.textContent = newQty;
-            form.submit();
-        }
-    }
-</script>
+async function updateQty(productId, change, maxStock) {
+    const qtyInput = document.getElementById(`qty-input-${productId}`);
+    const qtyDisplay = document.getElementById(`qty-display-${productId}`);
+    
+    if (!qtyInput || !qtyDisplay) return;
 
+    let currentQty = parseInt(qtyInput.value);
+    let newQty = currentQty + change;
+
+    if (newQty < 1) {
+        alert("Quantity cannot be less than 1. Remove the item if you do not want it.");
+        return;
+    }
+    if (newQty > maxStock) {
+        alert(`Sorry, only ${maxStock} items are currently available in stock.`);
+        return;
+    }
+
+    qtyInput.value = newQty;
+    qtyDisplay.innerText = newQty;
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+    try {
+        const response = await fetch(`/cart/update-qty-ajax/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({
+                "product_id": productId,
+                "quantity": newQty
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            const cartSubtotal = document.getElementById("cart-subtotal");
+            const cartGrandtotal = document.getElementById("cart-grandtotal");
+            const itemSubtotal = document.getElementById(`item-subtotal-${productId}`);
+
+            if (cartSubtotal) cartSubtotal.innerText = `Rs. ${data.cart_subtotal}`;
+            if (cartGrandtotal) cartGrandtotal.innerText = `Rs. ${data.cart_grandtotal}`;
+            if (itemSubtotal) itemSubtotal.innerText = `Rs. ${data.item_subtotal}`;
+        } else {
+            qtyInput.value = currentQty;
+            qtyDisplay.innerText = currentQty;
+            alert(data.message || "Could not update quantity.");
+        }
+    } catch (error) {
+        qtyInput.value = currentQty;
+        qtyDisplay.innerText = currentQty;
+        console.error("AJAX Error:", error);
+    }
+}
+</script>
 {% endblock %}
